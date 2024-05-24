@@ -19,7 +19,9 @@ Clone the repository:<br>
 `git clone https://github.com/tkjonesy/System-Software-Project.git`
 
 
-## Getting Started
+## Running the Code
+
+Open your terminal of choice.<br>
 
 Navigate to the folder: <br>
 `cd ...\System Software Project`
