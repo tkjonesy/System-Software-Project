@@ -1,6 +1,6 @@
 # System Software Project Files
 
-This Repository contains the program files and build intructions for the System Software promgramming project. 
+This Repository contains the program files and build intructions for the System Software programming project. 
 
 ## Table of Contents
 
