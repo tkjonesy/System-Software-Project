@@ -33,8 +33,7 @@ int main(int argc, char *argv[]) {
     }
 
   }
-  // File name passed incorrectly as argumnent or file does not exsist (Trever
-  // Jones)
+  // File name passed incorrectly as argumnent or file does not exsist (Trever Jones)
   else {
     printf("No file named %s found\n", argv[1]);
   }
