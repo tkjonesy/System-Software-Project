@@ -24,7 +24,7 @@ Clone the repository:<br>
 Open your terminal of choice.<br>
 
 Navigate to the folder: <br>
-`cd ...\System Software Project`
+`cd ...\System Software Project\`
 
 Compile the code:<br>
 `gcc -o vm vm.c`
