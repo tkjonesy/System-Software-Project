@@ -9,5 +9,5 @@ This Repository contains the program files and build intructions for the System 
 
 ## Getting Started
 
-Clone the repository:\n
+Clone the repository:<br>
 `git clone https://github.com/tkjonesy/System-Software-Project.git`
