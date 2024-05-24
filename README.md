@@ -10,7 +10,7 @@ Jose Porta<br>
 ## Table of Contents
 
 - [Getting Started](#getting-started)
-- [Running The Code](running-the-code)
+- [Running The Code](#running-the-code)
 
 
 ## Getting Started
