@@ -49,13 +49,45 @@ int main(int argc, char *argv[]) {
   int PC = 10;
   int IR[3] = {0, 0, 0};
 
-  // Fetch Cycle --
+  // Fetch Cycle -- index = end of "text" section of PAS (Jose Porta)
   while (PC != index) {
     IR[0] = PAS[PC];
     IR[1] = PAS[PC + 1];
     IR[2] = PAS[PC + 2];
 
     /* Execution happens here */
+    switch (IR[0]) {
+    case LIT:
+      /* code */
+      break;
+    case OPR:
+      /* code */
+      break;
+    case LOD:
+      /* code */
+      break;
+    case STO:
+      /* code */
+      break;
+    case CAL:
+      /* code */
+      break;
+    case INC:
+      /* code */
+      break;
+    case JMP:
+      /* code */
+      break;
+    case JPC:
+      /* code */
+      break;
+    case SYS:
+      /* code */
+      break;
+    default:
+      printf("Invalid Instruction.\n");
+      break;
+    }
 
     PC += 3;
   }
