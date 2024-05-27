@@ -32,7 +32,6 @@ Ensure input file is in the same directory then run the .exe passing the input f
 
 ## Example
 
-Provide a simple example to illustrate how to use your program:
 ```bash
 # Example command and expected output
 vm.exe input.txt
@@ -63,13 +62,13 @@ Output result is: 3
 
 ## Team Members
 
-Team Member 1: Trever Jones, tr755969@ucf.edu
-Team Member 2: Jose Porta, Jose.porta@ucf.edu
+Team Member 1: Trever Jones, tr755969@ucf.edu<br>
+Team Member 2: Jose Porta, Jose.porta@ucf.edu<br>
 
 ## Contact Information
 For any questions or issues, please contact:
 
-Name: Trever Jones
+Name: Trever Jones<br>
 Email: tr755969@ucf.edu
 
 
