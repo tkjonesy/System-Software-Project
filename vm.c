@@ -75,6 +75,10 @@ int main(int argc, char *argv[]) {
   int BP = 499;
   int SP = 500;
   int PC = 10;
+
+  // End of Program flag (Jose Porta)
+  int eop = 0;
+
   InstructionRegister IR;
   IR.OP = 0;
   IR.L = 0;
@@ -85,56 +89,153 @@ int main(int argc, char *argv[]) {
   printf("Initial values %15d %10d %10d\n\n", PC, BP, SP);
 
   // FETCH CYCLE -- index = end of "text" section of PAS (Jose Porta)
-  while (PC != index) {
+  while (eop != 1) {
     IR.OP = PAS[PC];
     IR.L = PAS[PC + 1];
     IR.M = PAS[PC + 2];
-
+    PC += 3;
     // EXECUTION CYCLE (Trever Jones / Jose Porta)
     switch (IR.OP) {
     case LIT:
       SP--;
       PAS[SP] = IR.M;
+      break;
 
-      break;
+    // Arithmetic Operations (Jose Porta)
     case OPR:
-      /* code */
+      switch (IR.M) {
+      case RTN:
+        SP = BP + 1;
+        BP = PAS[SP - 2];
+        PC = PAS[SP - 3];
+        break;
+
+      case ADD:
+        PAS[SP + 1] = PAS[SP + 1] + PAS[SP];
+        SP = SP + 1;
+        break;
+
+      case SUB:
+        PAS[SP + 1] = PAS[SP + 1] - PAS[SP];
+        SP = SP + 1;
+        break;
+
+      case MUL:
+        PAS[SP + 1] = PAS[SP + 1] * PAS[SP];
+        SP = SP + 1;
+        break;
+
+      case DIV:
+        PAS[SP + 1] = PAS[SP + 1] / PAS[SP];
+        SP = SP + 1;
+        break;
+
+      case EQL:
+        PAS[SP + 1] = PAS[SP + 1] == PAS[SP];
+        SP = SP + 1;
+        break;
+
+      case NEQ:
+        PAS[SP + 1] = PAS[SP + 1] != PAS[SP];
+        SP = SP + 1;
+        break;
+
+      case LSS:
+        PAS[SP + 1] = PAS[SP + 1] < PAS[SP];
+        SP = SP + 1;
+        break;
+
+      case LEQ:
+        PAS[SP + 1] = PAS[SP + 1] <= PAS[SP];
+        SP = SP + 1;
+        break;
+
+      case GTR:
+        PAS[SP + 1] = PAS[SP + 1] > PAS[SP];
+        SP = SP + 1;
+        break;
+
+      case GEQ:
+        PAS[SP + 1] = PAS[SP + 1] > PAS[SP];
+        SP = SP + 1;
+        break;
+
+      default:
+        break;
+      }
       break;
+      // End Math Ops
+
     case LOD:
       SP--;
       PAS[SP] = PAS[base(BP, IR.L) - IR.M];
-
       break;
+
     case STO:
       PAS[base(BP, IR.L) - IR.M] = PAS[SP];
-
       SP++;
       break;
+
     case CAL:
-      /* code */
+      PAS[SP - 1] = base(BP, IR.L);
+      PAS[SP - 2] = BP;
+      PAS[SP - 3] = PC;
+
+      BP = SP - 1;
+      PC = IR.M;
       break;
+
     case INC:
       SP = SP - IR.M;
 
       break;
+
     case JMP:
-      /* code */
+      PC = IR.M;
       break;
+
     case JPC:
-      /* code */
+      if (PAS[SP] == 0) {
+        PC = IR.M;
+      }
+
       break;
+
+    // SYSTEM CALLS (Jose Porta)
     case SYS:
-      /* code */
+      switch (IR.M) {
+      case 1: // OUTPUT
+        printf("%d\n", PAS[SP]);
+        SP = SP + 1;
+        break;
+
+      case 2: // INPUT
+        SP = SP - 1;
+        // PAS[SP] = getc(stdin);
+        fscanf(stdin, " %d", &PAS[SP]);
+        break;
+
+      case 3: // HALT
+        eop = 1;
+        break;
+
+      default:
+        break;
+      }
       break;
+    // End SYS Calls
     default:
       printf("Invalid Instruction.\n");
       break;
     }
 
-    PC += 3;
-
     // VM status output (Jose Porta)
-    printf("%-5s %-5d %-5d", &i_names[IR.OP], IR.L, IR.M);
+    if (IR.OP != 2) {
+      printf("%-5s %-5d %-5d", i_names[IR.OP], IR.L, IR.M);
+    } else {
+      printf("%-5s %-5d %-5d", opr_names[IR.M], IR.L, IR.M);
+    }
+
     printf("%13d %10d %10d %5s", PC, BP, SP, "");
     for (int i = 0; i <= ARRAY_SIZE - SP; i++) {
       printf("%d ", PAS[ARRAY_SIZE - i]);
