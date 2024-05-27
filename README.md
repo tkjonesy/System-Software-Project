@@ -62,13 +62,13 @@ Output result is: 3
 
 ## Team Members
 
-Team Member 1: Trever Jones, tr755969@ucf.edu
-Team Member 2: Jose Porta, Jose.porta@ucf.edu
+Team Member 1: Trever Jones, tr755969@ucf.edu<br>
+Team Member 2: Jose Porta, Jose.porta@ucf.edu<br>
 
 ## Contact Information
 For any questions or issues, please contact:
 
-Name: Trever Jones
+Name: Trever Jones<br>
 Email: tr755969@ucf.edu
 
 
