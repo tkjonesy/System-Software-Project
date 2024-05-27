@@ -163,6 +163,7 @@ int main(int argc, char *argv[]) {
       default:
         break;
       }
+
       break;
       // End Math Ops
 
@@ -205,13 +206,14 @@ int main(int argc, char *argv[]) {
     case SYS:
       switch (IR.M) {
       case 1: // OUTPUT
-        printf("%d\n", PAS[SP]);
+        printf("Output result is: %d\n", PAS[SP]);
         SP = SP + 1;
         break;
 
       case 2: // INPUT
         SP = SP - 1;
         // PAS[SP] = getc(stdin);
+        printf("Please Enter an Integer: ");
         fscanf(stdin, " %d", &PAS[SP]);
         break;
 
