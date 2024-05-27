@@ -77,6 +77,7 @@ int main(int argc, char *argv[]) {
     IR.OP = PAS[PC];
     IR.L = PAS[PC + 1];
     IR.M = PAS[PC + 2];
+    PC += 3;
 
     /* Execution happens here */
     switch (IR.OP) {
@@ -111,8 +112,6 @@ int main(int argc, char *argv[]) {
       printf("Invalid Instruction.\n");
       break;
     }
-
-    PC += 3;
   }
 
   return 0;
