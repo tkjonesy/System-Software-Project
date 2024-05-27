@@ -32,7 +32,6 @@ Ensure input file is in the same directory then run the .exe passing the input f
 
 ## Example
 
-Provide a simple example to illustrate how to use your program:
 ```bash
 # Example command and expected output
 vm.exe input.txt
