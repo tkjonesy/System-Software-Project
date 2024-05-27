@@ -9,13 +9,33 @@ Jose Porta
 // Constants
 // PAS length size (Jose Porta)
 #define ARRAY_SIZE 500
+int PAS[ARRAY_SIZE] = {0};
 
 // Instruction and Opr. enums (Jose Porta)
 enum Instruct { LIT = 1, OPR, LOD, STO, CAL, INC, JMP, JPC, SYS };
 enum Oprs { RTN = 0, ADD, SUB, MUL, DIV, EQL, NEQ, LSS, LEQ, GTR, GEQ };
 
+// Struct for Instruction Register (Trever Jones)
+typedef struct InstructionRegister {
+  int OP;
+  int L;
+  int M;
+} InstructionRegister;
+
+// Find base L levels down, PROVIDED FUNCTION (Trever Jones)
+int base(int BP, int L) {
+  // arb = activation record base
+  int arb = BP; 
+
+  //find base L levels down
+  while ( L > 0) {
+    arb = PAS[arb];
+    L--;
+  }
+  return arb;
+} 
+
 int main(int argc, char *argv[]) {
-  int PAS[ARRAY_SIZE] = {0};
   int OP, L, M;
   int index = 10;
 
@@ -28,6 +48,7 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
+  // Reading in input from input file (Trever Jones)
   if (file != NULL) {
     while (fscanf(file, "%d %d %d", &OP, &L, &M) == 3) {
       PAS[index] = OP;
@@ -46,16 +67,19 @@ int main(int argc, char *argv[]) {
   int BP = 499;
   int SP = 500;
   int PC = 10;
-  int IR[3] = {0, 0, 0};
+  InstructionRegister IR;
+  IR.OP = 0;
+  IR.L = 0;
+  IR.M = 0;
 
   // Fetch Cycle -- index = end of "text" section of PAS (Jose Porta)
   while (PC != index) {
-    IR[0] = PAS[PC];
-    IR[1] = PAS[PC + 1];
-    IR[2] = PAS[PC + 2];
+    IR.OP = PAS[PC];
+    IR.L = PAS[PC + 1];
+    IR.M = PAS[PC + 2];
 
     /* Execution happens here */
-    switch (IR[0]) {
+    switch (IR.OP) {
     case LIT:
       /* code */
       break;
