@@ -72,32 +72,39 @@ int main(int argc, char *argv[]) {
   IR.L = 0;
   IR.M = 0;
 
-  // Fetch Cycle -- index = end of "text" section of PAS (Jose Porta)
+  // FETCH CYCLE -- index = end of "text" section of PAS (Jose Porta)
   while (PC != index) {
     IR.OP = PAS[PC];
     IR.L = PAS[PC + 1];
     IR.M = PAS[PC + 2];
     PC += 3;
 
-    /* Execution happens here */
+    // EXECUTION CYCLE (Trever Jones / Jose Porta)
     switch (IR.OP) {
     case LIT:
-      /* code */
+      SP--;
+      PAS[SP] = IR.M;
+      printf("%d added to the stack at index %d of the stack\n", PAS[SP], SP);
       break;
     case OPR:
       /* code */
       break;
     case LOD:
-      /* code */
+      SP--;
+      PAS[SP] = PAS[base(BP, IR.L) - IR.M];
+      printf("%d loaded to the top of the stack\n", PAS[base(BP, IR.L) - IR.M]);
       break;
     case STO:
-      /* code */
+      PAS[base(BP, IR.L) - IR.M] = PAS[SP];
+      printf("%d stored from top of stack\n", PAS[SP]);
+      SP++;
       break;
     case CAL:
       /* code */
       break;
     case INC:
-      /* code */
+      SP = SP - IR.M;
+      printf("%d spots allocated for local variables\n", IR.M);
       break;
     case JMP:
       /* code */
