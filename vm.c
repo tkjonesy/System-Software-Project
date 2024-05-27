@@ -135,7 +135,11 @@ int main(int argc, char *argv[]) {
 
     // VM status output (Jose Porta)
     printf("%-5s %-5d %-5d", &i_names[IR.OP], IR.L, IR.M);
-    printf("%13d %10d %10d\n", PC, BP, SP);
+    printf("%13d %10d %10d", PC, BP, SP);
+    for (int i = 0; i <= ARRAY_SIZE - SP; i++) {
+      printf("%5d", PAS[ARRAY_SIZE - i]);
+    }
+    printf("\n");
   }
 
   return 0;
