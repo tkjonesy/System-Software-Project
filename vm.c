@@ -17,9 +17,9 @@ enum Oprs { RTN = 0, ADD, SUB, MUL, DIV, EQL, NEQ, LSS, LEQ, GTR, GEQ };
 
 // Instruct names as strings (Jose Porta)
 // "N/A" is a place holder so string indexes align with Instruct enum
-char i_names[10][3] = {"N/A", "LIT", "OPR", "LOD", "STO",
+char i_names[10][4] = {"N/A", "LIT", "OPR", "LOD", "STO",
                        "CAL", "INC", "JMP", "JPC", "SYS"};
-char opr_names[11][3] = {"RTN", "ADD", "SUB", "MUL", "DIV", "EQL",
+char opr_names[11][4] = {"RTN", "ADD", "SUB", "MUL", "DIV", "EQL",
                          "NEQ", "LSS", "LEQ", "GTR", "GEQ"};
 
 // Struct for Instruction Register (Trever Jones)
@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
 
   // Reading in input from input file (Trever Jones)
   if (file != NULL) {
-    while (fscanf(file, "%d %d %d", &OP, &L, &M) == 3) {
+    while (fscanf(file, " %d %d %d", &OP, &L, &M) == 3) {
       PAS[index] = OP;
       PAS[index + 1] = L;
       PAS[index + 2] = M;
@@ -81,15 +81,14 @@ int main(int argc, char *argv[]) {
   IR.M = 0;
 
   // Initial VM status message (Jose Porta)
-  printf("%20s %10s %10s %10s", "PC", "BP", "SP", "stack\n");
-  printf("Initial values\t %-10d %-10d %-10d\n\n", PC, BP, SP);
+  printf("%30s %10s %10s %10s", "PC", "BP", "SP", "stack\n");
+  printf("Initial values %15d %10d %10d\n\n", PC, BP, SP);
 
   // FETCH CYCLE -- index = end of "text" section of PAS (Jose Porta)
   while (PC != index) {
     IR.OP = PAS[PC];
     IR.L = PAS[PC + 1];
     IR.M = PAS[PC + 2];
-    PC += 3;
 
     // EXECUTION CYCLE (Trever Jones / Jose Porta)
     switch (IR.OP) {
@@ -131,6 +130,12 @@ int main(int argc, char *argv[]) {
       printf("Invalid Instruction.\n");
       break;
     }
+
+    PC += 3;
+
+    // VM status output (Jose Porta)
+    printf("%-5s %-5d %-5d", &i_names[IR.OP], IR.L, IR.M);
+    printf("%13d %10d %10d\n", PC, BP, SP);
   }
 
   return 0;
