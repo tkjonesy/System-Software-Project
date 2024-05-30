@@ -65,10 +65,10 @@ int main(int argc, char *argv[]) {
     }
 
   }
-  // File name passed incorrectly as argumnent or file does not exsist (Trever
-  // Jones)
+  // File name passed incorrectly as argumnent or file does not exsist (Trever Jones)
   else {
     printf("No file named %s found\n", argv[1]);
+    return 1;
   }
 
   // Register initialization (Jose Porta)
@@ -85,7 +85,7 @@ int main(int argc, char *argv[]) {
   IR.M = 0;
 
   // Initial VM status message (Jose Porta)
-  printf("%30s %10s %10s %10s", "PC", "BP", "SP", "stack\n");
+  printf("%30s %10s %10s %10s", "PC", "BP", "SP", "Stack\n");
   printf("Initial values %15d %10d %10d\n\n", PC, BP, SP);
 
   // FETCH CYCLE -- index = end of "text" section of PAS (Jose Porta)
@@ -112,52 +112,52 @@ int main(int argc, char *argv[]) {
 
       case ADD:
         PAS[SP + 1] = PAS[SP + 1] + PAS[SP];
-        SP = SP + 1;
+        SP++;
         break;
 
       case SUB:
         PAS[SP + 1] = PAS[SP + 1] - PAS[SP];
-        SP = SP + 1;
+        SP++;
         break;
 
       case MUL:
         PAS[SP + 1] = PAS[SP + 1] * PAS[SP];
-        SP = SP + 1;
+        SP++;
         break;
 
       case DIV:
         PAS[SP + 1] = PAS[SP + 1] / PAS[SP];
-        SP = SP + 1;
+        SP++;
         break;
 
       case EQL:
         PAS[SP + 1] = PAS[SP + 1] == PAS[SP];
-        SP = SP + 1;
+        SP++;
         break;
 
       case NEQ:
         PAS[SP + 1] = PAS[SP + 1] != PAS[SP];
-        SP = SP + 1;
+        SP++;
         break;
 
       case LSS:
         PAS[SP + 1] = PAS[SP + 1] < PAS[SP];
-        SP = SP + 1;
+        SP++;
         break;
 
       case LEQ:
         PAS[SP + 1] = PAS[SP + 1] <= PAS[SP];
-        SP = SP + 1;
+        SP++;
         break;
 
       case GTR:
         PAS[SP + 1] = PAS[SP + 1] > PAS[SP];
-        SP = SP + 1;
+        SP++;
         break;
 
       case GEQ:
         PAS[SP + 1] = PAS[SP + 1] > PAS[SP];
-        SP = SP + 1;
+        SP++;
         break;
 
       default:
@@ -197,6 +197,7 @@ int main(int argc, char *argv[]) {
     case JPC:
       if (PAS[SP] == 0) {
         PC = IR.M;
+        SP++;
       }
 
       break;
@@ -205,13 +206,13 @@ int main(int argc, char *argv[]) {
     case SYS:
       switch (IR.M) {
       case 1: // OUTPUT
-        printf("%d\n", PAS[SP]);
-        SP = SP + 1;
+        printf("Output result is: %d\n", PAS[SP]);
+        SP++;
         break;
 
       case 2: // INPUT
-        SP = SP - 1;
-        // PAS[SP] = getc(stdin);
+        SP--;
+        printf("Please enter an integer: ");
         fscanf(stdin, " %d", &PAS[SP]);
         break;
 
@@ -229,7 +230,7 @@ int main(int argc, char *argv[]) {
       break;
     }
 
-    // VM status output (Jose Porta)
+    // VM status output (Jose Porta / Trever Jones)
     if (IR.OP != 2) {
       printf("%-5s %-5d %-5d", i_names[IR.OP], IR.L, IR.M);
     } else {
@@ -237,8 +238,15 @@ int main(int argc, char *argv[]) {
     }
 
     printf("%13d %10d %10d %5s", PC, BP, SP, "");
-    for (int i = 0; i <= ARRAY_SIZE - SP; i++) {
-      printf("%d ", PAS[ARRAY_SIZE - i]);
+
+    for (int i = 499; i >= SP; i--) {
+      printf("%d ", PAS[i]);
+
+      // Checking for boundry between activation records (Trever Jones)
+      // THIS IS BROKEN!
+      if (i < 500 && (i == BP + 1 || i == PAS[BP + 1]) && IR.OP != 5) {
+        printf("| ");
+      }
     }
     printf("\n");
   }
