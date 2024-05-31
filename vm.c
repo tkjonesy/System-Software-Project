@@ -65,7 +65,8 @@ int main(int argc, char *argv[]) {
     }
 
   }
-  // File name passed incorrectly as argumnent or file does not exsist (Trever Jones)
+  // File name passed incorrectly as argumnent or file does not exsist (Trever
+  // Jones)
   else {
     printf("No file named %s found\n", argv[1]);
     return 1;
@@ -78,7 +79,7 @@ int main(int argc, char *argv[]) {
 
   // An array to keep track AR borders for printing "|" (Trever Jones)
   int BPHistory[100];
-  int BPHistorySize = 0; 
+  int BPHistorySize = 0;
 
   // End of Program flag (Jose Porta)
   int eop = 0;
@@ -113,8 +114,7 @@ int main(int argc, char *argv[]) {
         SP = BP + 1;
         BP = PAS[SP - 2];
         PC = PAS[SP - 3];
-        // Remove border from AR array
-        BPHistorySize--;
+
         break;
 
       case ADD:
@@ -191,8 +191,6 @@ int main(int argc, char *argv[]) {
 
       BP = SP - 1;
       PC = IR.M;
-      // Add BP to AR border array (Trever Jones)
-      BPHistory[BPHistorySize++] = BP;
       break;
 
     case INC:
@@ -238,6 +236,14 @@ int main(int argc, char *argv[]) {
     default:
       printf("Invalid Instruction.\n");
       break;
+    }
+    if (IR.OP == OPR && IR.M == RTN) {
+      // Remove border from AR array
+      BPHistorySize--;
+    }
+    if (IR.OP == CAL) {
+      // Add BP to AR border array (Trever Jones)
+      BPHistory[BPHistorySize++] = BP;
     }
 
     // VM status output (Jose Porta / Trever Jones)
