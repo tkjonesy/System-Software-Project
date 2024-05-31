@@ -76,17 +76,22 @@ int main(int argc, char *argv[]) {
   int SP = 500;
   int PC = 10;
 
+  // An array to keep track AR borders for printing "|" (Trever Jones)
+  int BPHistory[100];
+  int BPHistorySize = 0; 
+
   // End of Program flag (Jose Porta)
   int eop = 0;
 
+  // Initialize instruction register (Trever Jones)
   InstructionRegister IR;
   IR.OP = 0;
   IR.L = 0;
   IR.M = 0;
 
   // Initial VM status message (Jose Porta)
-  printf("%30s %10s %10s %10s", "PC", "BP", "SP", "Stack\n");
-  printf("Initial values %15d %10d %10d\n\n", PC, BP, SP);
+  printf("%-16s%-8s%-8s%-8s%s\n", "", "PC", "BP", "SP", "Stack");
+  printf("Initial values: %-8d%-8d%d\n\n", PC, BP, SP);
 
   // FETCH CYCLE -- index = end of "text" section of PAS (Jose Porta)
   while (eop != 1) {
@@ -108,6 +113,8 @@ int main(int argc, char *argv[]) {
         SP = BP + 1;
         BP = PAS[SP - 2];
         PC = PAS[SP - 3];
+        // Remove border from AR array
+        BPHistorySize--;
         break;
 
       case ADD:
@@ -184,6 +191,8 @@ int main(int argc, char *argv[]) {
 
       BP = SP - 1;
       PC = IR.M;
+      // Add BP to AR border array (Trever Jones)
+      BPHistory[BPHistorySize++] = BP;
       break;
 
     case INC:
@@ -198,8 +207,8 @@ int main(int argc, char *argv[]) {
     case JPC:
       if (PAS[SP] == 0) {
         PC = IR.M;
-        SP++;
       }
+      SP++;
 
       break;
 
@@ -233,20 +242,21 @@ int main(int argc, char *argv[]) {
 
     // VM status output (Jose Porta / Trever Jones)
     if (IR.OP != 2) {
-      printf("%-5s %-5d %-5d", i_names[IR.OP], IR.L, IR.M);
+      printf("  %s %d %-8d", i_names[IR.OP], IR.L, IR.M);
     } else {
-      printf("%-5s %-5d %-5d", opr_names[IR.M], IR.L, IR.M);
+      printf("  %s %d %-8d", opr_names[IR.M], IR.L, IR.M);
     }
 
-    printf("%13d %10d %10d %5s", PC, BP, SP, "");
+    printf("%-8d%-8d%-8d", PC, BP, SP);
 
     for (int i = 499; i >= SP; i--) {
       printf("%d ", PAS[i]);
 
       // Checking for boundry between activation records (Trever Jones)
-      // THIS IS BROKEN!
-      if (i < 500 && (i == BP + 1 || i == PAS[BP + 1]) && IR.OP != 5) {
-        printf("| ");
+      for (int j = 0; j < BPHistorySize; j++) {
+        if (i == BPHistory[j] + 1 && i != SP) {
+          printf("| ");
+        }
       }
     }
     printf("\n");
