@@ -28,7 +28,7 @@ Compile the code:<br>
 `gcc -o vm vm.c`
 
 Ensure input file is in the same directory then run the .exe passing the input file name:<br>
-`vm.exe <inputFileName>`
+`./vm.exe <inputFileName>`
 
 ## Example
 
