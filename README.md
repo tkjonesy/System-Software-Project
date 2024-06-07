@@ -25,10 +25,10 @@ Navigate to the folder: <br>
 `cd ...\System Software Project\`
 
 Compile the code:<br>
-`gcc -o scanner scanner.c`
+`gcc -o lex lex.c`
 
 Ensure input file is in the same directory then run the .exe passing the input file name:<br>
-`./scanner.exe <inputFileName>`
+`./lex.exe <inputFileName>`
 
 ## Example
 
