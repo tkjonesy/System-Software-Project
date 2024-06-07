@@ -1,4 +1,4 @@
-# Homework 1: Virtual Machine Implementaion
+# Homework 2: Token Scanner
 
 ## Description
 
