@@ -2,7 +2,13 @@
 
 ## Description
 
-This project is lexical parser for PL/0. A VM is a software implemenation of an instruction set architecture. This project is written in c and will run with an input file that contains an instruction set architecture.
+This project is lexical parser for PL/0. The program takes PL/0 program (.txt) as input and parses for tokens based
+on the following lexical grammar:
+
+ident ::= letter {letter | digit}.
+letter ::= "a" | "b" | ... | "y" | "z" | "A" | "B" | ... | "Y" | "Z".
+number ::= digit {digit}.
+digit ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9“.
 
 ## Table of Contents
 
