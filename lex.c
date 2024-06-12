@@ -6,6 +6,7 @@ Jose Porta
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 // Max length macros (Jose Porta)
 #define MAX_ID_LEN 11
@@ -60,13 +61,16 @@ typedef struct Token {
 } Token;
 
 // Main parsing loop (Jose Porta)
-void parser(long f_sz, char input_arr[]) {
+void parser(long f_sz, char input_arr[], char token_list[]) {
   int comment_state = 0;
   int parser_pos = 0;
+  Token identifier[MAX_ID_LEN];
+  Token number[MAX_NUM_LEN];
+
   for (int i = 0; i < f_sz; i++) {
-    char next_char = input_arr[i];
+    char currChar = input_arr[i];
     // Detect comments
-    switch (next_char) {
+    switch (currChar) {
     case '/':
       if (comment_state == 0) {
         // Comment state partially active
@@ -86,8 +90,8 @@ void parser(long f_sz, char input_arr[]) {
         // Comment state partially deactivated
         comment_state = 1;
       }
-
       break;
+
     default:
       break;
     }
@@ -96,12 +100,15 @@ void parser(long f_sz, char input_arr[]) {
       continue;
     }
 
-    printf("%c", next_char);
+    if (isdigit(currChar)){
+      printf("%c is recognized as a digit\n", currChar);
+    }
   }
 }
 
 int main(int argc, char *argv[]) {
   char *inputArr = NULL;
+  char *tokenList = NULL;
   FILE *file;
   file = fopen(argv[1], "r");
   long fileSize = 0;
@@ -134,15 +141,19 @@ int main(int argc, char *argv[]) {
     fclose(file);
   }
 
-  // File name passed incorrectly as argumnent or file does not exsist (Trever
-  // Jones)
+  // File name passed incorrectly as argumnent or file does not exsist (Trever Jones)
   else {
     printf("No file named %s found\n", argv[1]);
     return 1;
   }
 
-  printf("Source Program:\n%s\n", inputArr);
-  parser(fileSize, inputArr);
+  tokenList[fileSize];
+
+  printf("Source Program:\n%s\n\n", inputArr);
+  printf("Lexeme Table:\n\n");
+
+  // Parse inputArr
+  parser(fileSize, inputArr, tokenList);
   free(inputArr);
   return 0;
 }
