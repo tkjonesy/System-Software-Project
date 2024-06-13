@@ -127,7 +127,7 @@ int is_reserved(char identifier[]) {
   return identsym;
 }
 
-// Push new token to token table
+// Push new token to token table and reset curr_token (Jose Porta)
 int tokenize() {
   tokenList[num_tokens] = curr_token;
   // printf("Token added: %s\n", tokenList[num_tokens].lexeme);
@@ -181,23 +181,26 @@ void parser(long f_sz, char input_arr[]) {
     case 0:
       // If currChar is a letter -> state = identifier
       if (isalpha(currChar)) {
+        // switch FSA to identity state
         state = identsym;
+
+        // Set token type
         curr_token.type = identsym;
-        // Add char to identifier name
-        curr_token.lexeme[strlen(curr_token.lexeme)] = currChar;
+        // "rewind" loop to process char in the appropriate state (i.e.
+        // identsym)
+        i--;
         break;
       }
-
       // If currChar is a digit -> state = number
-      else if (isdigit(currChar)) {
+      if (isdigit(currChar)) {
         state = numbersym;
         curr_token.type = numbersym;
-        curr_token.lexeme[strlen(curr_token.lexeme)] = currChar;
+        i--;
         break;
       }
 
       // if currChar is a special character (Trever Jones)
-      else if (is_sym(currChar)) {
+      if (is_sym(currChar)) {
         state = is_sym(currChar);
         i--;
         break;

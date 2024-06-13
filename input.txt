@@ -1,4 +1,4 @@
-xvar w, x;
+xvar w, x, 5;
 read w;
 begin
    x:= 4;
