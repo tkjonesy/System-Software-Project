@@ -277,6 +277,29 @@ void parser(long f_sz, char input_arr[]) {
       tokenize();
       state = 0;
       break;
+    case constsym:
+    case varsym:
+    case procsym:
+    case callsym:
+    case beginsym:
+    case endsym:
+    case ifsym:
+    case fisym:
+    case thensym:
+    case elsesym:
+    case whilesym:
+    case dosym:
+    case readsym:
+    case writesym:
+      if (isalpha(nextChar) || isdigit(nextChar)) {
+        // Extra alpha-numeric characters imply identifier isn't a reserved word
+        // e.g. 'var' is reserved but 'vars55' is a valid, non-reserved
+        // identifier
+        state = identsym;
+        // rewind loop to process current char as part of identsym
+        i--;
+        break;
+      }
     default:
       break;
     }
