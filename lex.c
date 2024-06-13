@@ -4,14 +4,15 @@ Trever Jones
 Jose Porta
 */
 
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
 
 // Max length macros (Jose Porta)
 #define MAX_ID_LEN 11
 #define MAX_NUM_LEN 5
+#define TOKEN_TBL_SZ 1000
 
 // Token type enum (Jose Porta)
 typedef enum {
@@ -56,8 +57,8 @@ char *reserved[] = {"const", "var", "procedure", "call", "begin",
                     "end",   "if",  "fi",        "then", "else",
                     "while", "do",  "read",      "write"};
 int res_enums[] = {constsym, varsym, procsym, callsym, beginsym,
-                    endsym,   ifsym,  fisym, thensym, elsesym,
-                    whilesym, dosym,  readsym, writesym};
+                   endsym,   ifsym,  fisym,   thensym, elsesym,
+                   whilesym, dosym,  readsym, writesym};
 
 // Token struct (Jose Porta)
 typedef struct Token {
@@ -66,61 +67,60 @@ typedef struct Token {
 } Token;
 Token curr_token = {0, ""};
 // Token Table
-Token *tokenList = NULL;
+Token tokenList[TOKEN_TBL_SZ];
 int num_tokens = 0;
 
 // Determine Special Symbol type
 int is_sym(char c) {
-      switch (c){
-        case '+':
-        return plussym;
+  switch (c) {
+  case '+':
+    return plussym;
 
-        case '-':
-        return minussym;
+  case '-':
+    return minussym;
 
-        case '*':
-        return multsym;
+  case '*':
+    return multsym;
 
-        case '/':
-        return slashsym;
+  case '/':
+    return slashsym;
 
-        case '(':
-        return lparentsym;
+  case '(':
+    return lparentsym;
 
-        case ')':
-        return rparentsym;
+  case ')':
+    return rparentsym;
 
-        case '=':
-        return eqsym;
+  case '=':
+    return eqsym;
 
-        case ',':
-        return commasym;
+  case ',':
+    return commasym;
 
-        case '.':
-        return periodsym;
+  case '.':
+    return periodsym;
 
-        case '<':
-        return lessym;
+  case '<':
+    return lessym;
 
-        case '>':
-        return gtrsym;
+  case '>':
+    return gtrsym;
 
-        case ';':
-        return semicolonsym;
+  case ';':
+    return semicolonsym;
 
-        case ':':
-        return colonsym;
-        
-        default:
-        return 0;
-      }
+  case ':':
+    return colonsym;
 
+  default:
+    return 0;
+  }
 }
 
 // Checks if indentifier is a reserved word and if so, returns its type
-int is_reserved(char identifier[]){
-  for(int i=0; i < 14; i++){
-    if(strcmp(reserved[i], identifier) == 0){
+int is_reserved(char identifier[]) {
+  for (int i = 0; i < 14; i++) {
+    if (strcmp(reserved[i], identifier) == 0) {
       return res_enums[i];
     }
   }
@@ -128,14 +128,15 @@ int is_reserved(char identifier[]){
 }
 
 // Push new token to token table
-void tokenize(){
+int tokenize() {
   tokenList[num_tokens] = curr_token;
-  printf("Token added: %s\n", tokenList[num_tokens]);
+  // printf("Token added: %s\n", tokenList[num_tokens].lexeme);
   num_tokens++;
   curr_token.type = 0;
-  for (int i = 0; i < MAX_ID_LEN; i++){
-        curr_token.lexeme[i] = '\0';
-    }
+  for (int i = 0; i < MAX_ID_LEN; i++) {
+    curr_token.lexeme[i] = '\0';
+  }
+  return 0;
 }
 
 // Main parsing loop (Jose Porta)
@@ -145,8 +146,9 @@ void parser(long f_sz, char input_arr[]) {
   int currType = 0;
   int state = 0;
 
-  // i < f_sz prints extra chars and f_sz - 10 fixes it for some reason? (delete before submission)
-  for (int i = 0; i < f_sz-10 ; i++) {
+  // i < f_sz prints extra chars and f_sz - 10 fixes it for some reason? (delete
+  // before submission)
+  for (int i = 0; i < f_sz; i++) {
     char currChar = input_arr[i];
     char nextChar = input_arr[i + 1];
     // Detect comments
@@ -165,7 +167,7 @@ void parser(long f_sz, char input_arr[]) {
         comment_state = 0;
         i += 1;
         continue;
-      } 
+      }
 
     default:
       if (comment_state == 1) {
@@ -174,86 +176,105 @@ void parser(long f_sz, char input_arr[]) {
       break;
     }
     // printf("%c",input_arr[i]);
+    printf("State: %d, lexeme: %s\n", state, curr_token.lexeme);
+    switch (state) {
+    case 0:
+      // If currChar is a letter -> state = identifier
+      if (isalpha(currChar)) {
+        state = identsym;
+        curr_token.type = identsym;
+        // Add char to identifier name
+        curr_token.lexeme[strlen(curr_token.lexeme)] = currChar;
+        break;
+      }
 
-    switch(state){
-      case 0:
-        // If currChar is a letter -> state = identifier
-        if (isalpha(currChar)) {
-          state = identsym;
-          curr_token.type = identsym;
-          // Add char to identifier name
-          curr_token.lexeme[strlen(curr_token.lexeme)] = currChar;
-          break;
-        }
-        
-        // If currChar is a digit -> state = number
-        else if (isdigit(currChar)) {
-          state = numbersym;
-          curr_token.type = numbersym;
-          curr_token.lexeme[strlen(curr_token.lexeme)] = currChar;
-        }
+      // If currChar is a digit -> state = number
+      else if (isdigit(currChar)) {
+        state = numbersym;
+        curr_token.type = numbersym;
+        curr_token.lexeme[strlen(curr_token.lexeme)] = currChar;
+        break;
+      }
 
-        // if currChar is a special character (Trever Jones)
-        else if (is_sym(currChar)) {
-          state = is_sym(currChar);
-          // Add to token table, reset curr_token (Trever Jones)
-        }
+      // if currChar is a special character (Trever Jones)
+      else if (is_sym(currChar)) {
+        state = is_sym(currChar);
+        i--;
+        break;
+        // Add to token table, reset curr_token (Trever Jones)
+      }
 
-        // If currChar is a space (Trever Jones)
-        else if (isspace(currChar)) {
-          state = 0;
-          break;
-        }
+      // If currChar is a space (Trever Jones)
+      else if (isspace(currChar)) {
+        state = 0;
+        break;
+      }
 
-        // Handle invalid symbol (Trever Jones)
-        else {
-          state = 0;
-          printf("Invalid symbol\n");
-        }
+      // Handle invalid symbol (Trever Jones)
+      else {
+        state = 0;
+        printf("Invalid symbol\n");
+      }
       break;
 
-      case identsym:
+    case identsym:
       // identifiers have the form: letter(letter | digit)*
-        
-        if(isalpha(currChar) || isdigit(currChar)) {
-          // Add char to identifier name
-          curr_token.lexeme[strlen(curr_token.lexeme)] = currChar;
+      printf("State: identsym\n");
+      if (isalpha(currChar) || isdigit(currChar)) {
+        // Add char to identifier name
+        curr_token.lexeme[strlen(curr_token.lexeme)] = currChar;
 
-          // Need to implement function to check if name is reserved
-          // if (reserved(curr_token.lexeme) -> state = constsym or ifsym or varsym, etc.)
-          if(is_reserved(curr_token.lexeme)){
-            state = is_reserved(curr_token.lexeme);
-            break;
-          }
-
-          if (!isalpha(nextChar) || !isdigit(nextChar)){
-            // Add token to token table and reset curr_token
-            // This should be a separate function
-            tokenize();
-            state = 0;
-          } else if (strlen(curr_token.lexeme) > MAX_ID_LEN){
-            printf("Error: identifier %s execeeds max length (11)", curr_token.lexeme);
-            
-          }
-        } else {
-          tokenize();
-          state = 0;
+        // Need to implement function to check if name is reserved
+        // if (reserved(curr_token.lexeme) -> state = constsym or ifsym or
+        // varsym, etc.)
+        if (is_reserved(curr_token.lexeme)) {
+          state = is_reserved(curr_token.lexeme);
+          break;
         }
+
+      } else if (!isalpha(nextChar) || !isdigit(nextChar)) {
+        // Add token to token table and reset curr_token
+        // This should be a separate function
+        // printf("symbol should be tokenized here");
+
+        state = tokenize();
         break;
 
-      case numbersym:
-        curr_token.lexeme[strlen(curr_token.lexeme)] = currChar;
-        if (!isdigit(currChar)){
-          tokenize();
-          state = 0;
-        } 
-        
-        if (strlen(curr_token.lexeme) > MAX_NUM_LEN){
-            printf("Error: number %s execeeds max length (5)", curr_token.lexeme);
-            
-          }
+      } else if (strlen(curr_token.lexeme) > MAX_ID_LEN) {
+        printf("Error: identifier %s execeeds max length (11)",
+               curr_token.lexeme);
+      }
       break;
-      default:
+
+    case numbersym:
+      curr_token.lexeme[strlen(curr_token.lexeme)] = currChar;
+      if (!isdigit(currChar)) {
+        tokenize();
+        state = 0;
+      }
+
+      if (strlen(curr_token.lexeme) > MAX_NUM_LEN) {
+        printf("Error: number %s execeeds max length (5)", curr_token.lexeme);
+      }
+      break;
+    case plussym:
+    case minussym:
+    case multsym:
+    case slashsym:
+    case rparentsym:
+    case lparentsym:
+    case eqsym:
+    case commasym:
+    case periodsym:
+    case lessym:
+    case gtrsym:
+    case semicolonsym:
+    case colonsym:
+      curr_token.lexeme[strlen(curr_token.lexeme)] = currChar;
+      tokenize();
+      state = 0;
+      break;
+    default:
       break;
     }
     printf("%s\n", curr_token.lexeme);
@@ -262,7 +283,7 @@ void parser(long f_sz, char input_arr[]) {
 
 int main(int argc, char *argv[]) {
   char *inputArr = NULL;
-  
+
   FILE *file;
   file = fopen(argv[1], "r");
   long fileSize = 0;
@@ -294,14 +315,13 @@ int main(int argc, char *argv[]) {
     inputArr[fileSize] = '\0';
     fclose(file);
   }
-  
-  // File name passed incorrectly as argumnent or file does not exsist (Trever Jones)
+
+  // File name passed incorrectly as argumnent or file does not exsist (Trever
+  // Jones)
   else {
     printf("No file named %s found\n", argv[1]);
     return 1;
   }
-  
-  tokenList[fileSize];
 
   printf("Source Program:\n%s\n\n", inputArr);
   printf("Lexeme Table:\n\n");
@@ -309,5 +329,11 @@ int main(int argc, char *argv[]) {
   // Parse inputArr
   parser(fileSize, inputArr);
   free(inputArr);
+
+  printf("Token Table:\n");
+  for (int i = 0; i < num_tokens; i++) {
+    printf("%s ", tokenList[i].lexeme);
+  }
+
   return 0;
 }
