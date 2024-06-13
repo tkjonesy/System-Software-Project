@@ -130,7 +130,7 @@ int is_reserved(char identifier[]) {
 // Push new token to token table and reset curr_token (Jose Porta)
 int tokenize() {
   tokenList[num_tokens] = curr_token;
-  // printf("Token added: %s\n", tokenList[num_tokens].lexeme);
+  printf("Token added: %s\n", tokenList[num_tokens].lexeme);
   num_tokens++;
   curr_token.type = 0;
   for (int i = 0; i < MAX_ID_LEN; i++) {
@@ -148,7 +148,7 @@ void parser(long f_sz, char input_arr[]) {
 
   // i < f_sz prints extra chars and f_sz - 10 fixes it for some reason? (delete
   // before submission)
-  for (int i = 0; i < f_sz; i++) {
+  for (int i = 0; i < f_sz - 10; i++) {
     char currChar = input_arr[i];
     char nextChar = input_arr[i + 1];
     // Detect comments
@@ -176,7 +176,7 @@ void parser(long f_sz, char input_arr[]) {
       break;
     }
     // printf("%c",input_arr[i]);
-    printf("State: %d, lexeme: %s\n", state, curr_token.lexeme);
+
     switch (state) {
     case 0:
       // If currChar is a letter -> state = identifier
@@ -201,7 +201,7 @@ void parser(long f_sz, char input_arr[]) {
       }
 
       // if currChar is a special character (Trever Jones)
-      if (is_sym(currChar)) {
+      if (is_sym(currChar) != 0) {
         // Switch to state based on specific symbol type
         state = is_sym(currChar);
         curr_token.type = state;
@@ -229,16 +229,13 @@ void parser(long f_sz, char input_arr[]) {
       curr_token.lexeme[strlen(curr_token.lexeme)] = currChar;
 
       if (isalpha(currChar) || isdigit(currChar)) {
-
         // Check if identifier is a reserved word (returns identsym if not)
         state = is_reserved(curr_token.lexeme);
-        break;
       }
 
-      if (!isalpha(nextChar) || !isdigit(nextChar)) {
-        // Non alpha-numeric value implies end of identifier
+      // Non alpha-numeric value implies end of identifier
+      if (!isalpha(nextChar) && !isdigit(nextChar)) {
         state = tokenize();
-        break;
       }
       if (strlen(curr_token.lexeme) > MAX_ID_LEN) {
         printf("Error: identifier %s execeeds max length (11)",
@@ -253,7 +250,7 @@ void parser(long f_sz, char input_arr[]) {
       if (strlen(curr_token.lexeme) > MAX_NUM_LEN) {
         printf("Error: number %s execeeds max length (5)", curr_token.lexeme);
       }
-      if (!isdigit(currChar)) {
+      if (!isdigit(nextChar)) {
         tokenize();
         state = 0;
       }
@@ -273,7 +270,6 @@ void parser(long f_sz, char input_arr[]) {
     case semicolonsym:
     case colonsym:
       curr_token.lexeme[strlen(curr_token.lexeme)] = currChar;
-
       tokenize();
       state = 0;
       break;
@@ -300,9 +296,16 @@ void parser(long f_sz, char input_arr[]) {
         i--;
         break;
       }
+      // Non alpha-numeric value implies end of identifier
+      if (!isalpha(nextChar) && !isdigit(nextChar)) {
+        state = tokenize();
+        i--;
+        break;
+      }
     default:
       break;
     }
+    printf("State: %d, lexeme: %s\n", state, curr_token.lexeme);
     printf("%s\n", curr_token.lexeme);
   }
 }

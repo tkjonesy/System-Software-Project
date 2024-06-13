@@ -1,4 +1,4 @@
-xvar w, x, 5;
+.xvar w, x, 5;
 read w;
 begin
    x:= 4;
@@ -6,8 +6,8 @@ begin
    if w > x then
 	w:= w + 1
    else
-   / *test */
+   /*test */
 	w:= x;
    fi
-end
+end 
 write w.
