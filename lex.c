@@ -183,32 +183,35 @@ void parser(long f_sz, char input_arr[]) {
       if (isalpha(currChar)) {
         // switch FSA to identity state
         state = identsym;
-
         // Set token type
-        curr_token.type = identsym;
-        // "rewind" loop to process char in the appropriate state (i.e.
-        // identsym)
+        curr_token.type = state;
+        // "rewind" loop to process char in as part of identifier
         i--;
         break;
       }
       // If currChar is a digit -> state = number
       if (isdigit(currChar)) {
+        // Switch to number state
         state = numbersym;
-        curr_token.type = numbersym;
+        // Set current token to numbersym
+        curr_token.type = state;
+        // "rewind" loop to process char in as part of identifier
         i--;
         break;
       }
 
       // if currChar is a special character (Trever Jones)
       if (is_sym(currChar)) {
+        // Switch to state based on specific symbol type
         state = is_sym(currChar);
+        curr_token.type = state;
+        // "rewind" loop to process char in as symbol
         i--;
         break;
-        // Add to token table, reset curr_token (Trever Jones)
       }
 
-      // If currChar is a space (Trever Jones)
-      else if (isspace(currChar)) {
+      // If currChar is a space, skip to next char (Trever Jones)
+      if (isspace(currChar)) {
         state = 0;
         break;
       }
@@ -222,28 +225,22 @@ void parser(long f_sz, char input_arr[]) {
 
     case identsym:
       // identifiers have the form: letter(letter | digit)*
-      printf("State: identsym\n");
+      // Add char to identifier name
+      curr_token.lexeme[strlen(curr_token.lexeme)] = currChar;
+
       if (isalpha(currChar) || isdigit(currChar)) {
-        // Add char to identifier name
-        curr_token.lexeme[strlen(curr_token.lexeme)] = currChar;
 
-        // Need to implement function to check if name is reserved
-        // if (reserved(curr_token.lexeme) -> state = constsym or ifsym or
-        // varsym, etc.)
-        if (is_reserved(curr_token.lexeme)) {
-          state = is_reserved(curr_token.lexeme);
-          break;
-        }
+        // Check if identifier is a reserved word (returns identsym if not)
+        state = is_reserved(curr_token.lexeme);
+        break;
+      }
 
-      } else if (!isalpha(nextChar) || !isdigit(nextChar)) {
-        // Add token to token table and reset curr_token
-        // This should be a separate function
-        // printf("symbol should be tokenized here");
-
+      if (!isalpha(nextChar) || !isdigit(nextChar)) {
+        // Non alpha-numeric value implies end of identifier
         state = tokenize();
         break;
-
-      } else if (strlen(curr_token.lexeme) > MAX_ID_LEN) {
+      }
+      if (strlen(curr_token.lexeme) > MAX_ID_LEN) {
         printf("Error: identifier %s execeeds max length (11)",
                curr_token.lexeme);
       }
@@ -251,14 +248,16 @@ void parser(long f_sz, char input_arr[]) {
 
     case numbersym:
       curr_token.lexeme[strlen(curr_token.lexeme)] = currChar;
+
+      // NOTE: how to handle numbers >5 digits?
+      if (strlen(curr_token.lexeme) > MAX_NUM_LEN) {
+        printf("Error: number %s execeeds max length (5)", curr_token.lexeme);
+      }
       if (!isdigit(currChar)) {
         tokenize();
         state = 0;
       }
 
-      if (strlen(curr_token.lexeme) > MAX_NUM_LEN) {
-        printf("Error: number %s execeeds max length (5)", curr_token.lexeme);
-      }
       break;
     case plussym:
     case minussym:
@@ -274,6 +273,7 @@ void parser(long f_sz, char input_arr[]) {
     case semicolonsym:
     case colonsym:
       curr_token.lexeme[strlen(curr_token.lexeme)] = currChar;
+
       tokenize();
       state = 0;
       break;
