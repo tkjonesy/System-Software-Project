@@ -49,13 +49,12 @@ typedef enum {
   writesym,
   readsym,
   elsesym,
-  colonsym
 } token_type;
 
 // Reserved words (Jose Porta)
 char *reserved[] = {"const", "var", "procedure", "call", "begin",
-                    "end",   "if",  "fi",        "then", "else",
-                    "while", "do",  "read",      "write"};
+                    "end",   "if",  "fi", "then", "else",
+                    "while", "do",  "read", "write"};
 int res_enums[] = {constsym, varsym, procsym, callsym, beginsym,
                    endsym,   ifsym,  fisym,   thensym, elsesym,
                    whilesym, dosym,  readsym, writesym};
@@ -109,8 +108,11 @@ int is_sym(char c) {
   case ';':
     return semicolonsym;
 
+  // case ':=':
+  //   return becomessym;
+
   case ':':
-    return colonsym;
+  return 35;
 
   default:
     return 0;
@@ -127,17 +129,23 @@ int is_reserved(char identifier[]) {
   return identsym;
 }
 
-// Push new token to token table and reset curr_token (Jose Porta)
-int tokenize() {
-  tokenList[num_tokens] = curr_token;
-  printf("Token added: %s\n", tokenList[num_tokens].lexeme);
-  num_tokens++;
-  curr_token.type = 0;
+// Helper function to set all 11 chars in lexeme to null char
+void reset_lexeme(){
   for (int i = 0; i < MAX_ID_LEN; i++) {
     curr_token.lexeme[i] = '\0';
   }
+}
+
+// Push new token to token table and reset curr_token (Jose Porta)
+int tokenize() {
+  tokenList[num_tokens] = curr_token;
+  printf("Token added: '%s' %d\n", tokenList[num_tokens].lexeme, tokenList[num_tokens].type);
+  num_tokens++;
+  curr_token.type = 0;
+  reset_lexeme();
   return 0;
 }
+
 
 // Main parsing loop (Jose Porta)
 void parser(long f_sz, char input_arr[]) {
@@ -146,38 +154,75 @@ void parser(long f_sz, char input_arr[]) {
   int currType = 0;
   int state = 0;
 
-  // i < f_sz prints extra chars and f_sz - 10 fixes it for some reason? (delete
-  // before submission)
-  for (int i = 0; i < f_sz - 10; i++) {
+  for (int i = 0; i < f_sz; i++) {
     char currChar = input_arr[i];
-    char nextChar = input_arr[i + 1];
-    // Detect comments
-    switch (currChar) {
-    case '/':
-      if (nextChar == '*') {
-        // Comment state active
+    // Make sure nextChar can't go out of bounds (Trever Jones)
+    char nextChar = (i + 1 < f_sz) ? input_arr[i + 1] : '\0';
+    
+    // Detect comments (Trever Jones)
+    if (comment_state == 1) {
+      if (currChar == '*' && nextChar == '/') {
+        // Comment successfully closed (Trever Jones)
+        comment_state = 0;
+        // Skip '/' char (Trever Jones)
+        i++;
+        continue;
+      }
+      // Check that there are no more symbols left and comment is still open (Trever Jones)
+      if (i == f_sz - 1) {
+        printf("Error: Comment opened and not properly closed\n"); 
+        comment_state = 0;
+        // Reset position after opening '/*' (Trever Jones)
+        i = parser_pos;
+      }
+      // Skip other chars while comment is open (Trever Jones)
+      continue;
+    }
+    else {
+      // Comment is opened (Trever Jones)
+      if (currChar == '/' && nextChar == '*') {
         comment_state = 1;
         parser_pos = i;
+        // Skip '*' char (Trever Jones)
+        i++;
         continue;
       }
-      break;
-    case '*':
-      if (nextChar == '/' && comment_state == 1) {
-        // Comment state dectivated
-        comment_state = 0;
-        i += 1;
-        continue;
-      }
-
-    default:
-      if (comment_state == 1) {
-        continue;
-      }
-      break;
     }
-    // printf("%c",input_arr[i]);
+    // printf("comment state: %d\n", comment_state);
+    // switch (currChar) {
+      
+    // case '/':
+    //   if (nextChar == '*') {
+    //     // Comment state active
+    //     comment_state = 1;
+    //     parser_pos = i;
+    //     continue;
+    //   }
+    //   break;
+    // case '*':
+    //   if (nextChar == '/' && comment_state == 1) {
+    //     // Comment state dectivated
+    //     comment_state = 0;
+    //     i += 1;
+    //     continue;
+    //   }
+
+    // default:
+    //   if (comment_state == 1) {
+    //     // Check that there are no more symbols left and comment is still open (Trever Jones)
+    //     if (i == f_sz - 1) {
+    //       printf("Error: Comment opened and not properly closed\n"); 
+    //       comment_state = 0;
+    //       // Reset to the position after the opening '*' (Trever Jones)
+    //       i = parser_pos + 1;
+    //     }
+    //     continue;
+    //   }
+    //   break;
+    // }
 
     switch (state) {
+      
     case 0:
       // If currChar is a letter -> state = identifier
       if (isalpha(currChar)) {
@@ -190,7 +235,7 @@ void parser(long f_sz, char input_arr[]) {
         break;
       }
       // If currChar is a digit -> state = number
-      if (isdigit(currChar)) {
+      else if (isdigit(currChar)) {
         // Switch to number state
         state = numbersym;
         // Set current token to numbersym
@@ -201,7 +246,7 @@ void parser(long f_sz, char input_arr[]) {
       }
 
       // if currChar is a special character (Trever Jones)
-      if (is_sym(currChar) != 0) {
+      else if (is_sym(currChar) != 0) {
         // Switch to state based on specific symbol type
         state = is_sym(currChar);
         curr_token.type = state;
@@ -211,7 +256,7 @@ void parser(long f_sz, char input_arr[]) {
       }
 
       // If currChar is a space, skip to next char (Trever Jones)
-      if (isspace(currChar)) {
+      else if (isspace(currChar)) {
         state = 0;
         break;
       }
@@ -219,23 +264,32 @@ void parser(long f_sz, char input_arr[]) {
       // Handle invalid symbol (Trever Jones)
       else {
         state = 0;
-        printf("Invalid symbol\n");
+        printf("Error: Invalid symbol: '%s'\n", currChar);
+        reset_lexeme();
       }
       break;
 
     case identsym:
       // identifiers have the form: letter(letter | digit)*
       // Add char to identifier name
-      curr_token.lexeme[strlen(curr_token.lexeme)] = currChar;
+      
 
       if (isalpha(currChar) || isdigit(currChar)) {
+        curr_token.lexeme[strlen(curr_token.lexeme)] = currChar;
         // Check if identifier is a reserved word (returns identsym if not)
         state = is_reserved(curr_token.lexeme);
+        if (state != identsym){
+          i--;
+          break;
+        }
+        
       }
 
       // Non alpha-numeric value implies end of identifier
       if (!isalpha(nextChar) && !isdigit(nextChar)) {
         state = tokenize();
+
+        break;
       }
       if (strlen(curr_token.lexeme) > MAX_ID_LEN) {
         printf("Error: identifier %s execeeds max length (11)",
@@ -256,6 +310,7 @@ void parser(long f_sz, char input_arr[]) {
       }
 
       break;
+    case becomessym:
     case plussym:
     case minussym:
     case multsym:
@@ -268,10 +323,9 @@ void parser(long f_sz, char input_arr[]) {
     case lessym:
     case gtrsym:
     case semicolonsym:
-    case colonsym:
       curr_token.lexeme[strlen(curr_token.lexeme)] = currChar;
       tokenize();
-      state = 0;
+      state = 0;  
       break;
     case constsym:
     case varsym:
@@ -298,15 +352,29 @@ void parser(long f_sz, char input_arr[]) {
       }
       // Non alpha-numeric value implies end of identifier
       if (!isalpha(nextChar) && !isdigit(nextChar)) {
+        curr_token.type = state;
         state = tokenize();
-        i--;
         break;
       }
+      // ':' symbol
+    case 35:
+      if (nextChar == '=')
+      {
+        curr_token.lexeme[strlen(curr_token.lexeme)] = currChar;
+        curr_token.type = becomessym;
+        state = becomessym;
+        break;
+
+      } else {
+        printf("ERROR: Invalid symbol ':'\n");
+        reset_lexeme();
+        state = 0;
+      }
+      
     default:
       break;
     }
-    printf("State: %d, lexeme: %s\n", state, curr_token.lexeme);
-    printf("%s\n", curr_token.lexeme);
+    // printf("State: %d, lexeme: %s\n", state, curr_token.lexeme);
   }
 }
 
@@ -332,7 +400,7 @@ int main(int argc, char *argv[]) {
     fseek(file, 0, SEEK_SET);
 
     // Dynamically allocate input array (Trever Jones)
-    inputArr = (char *)malloc(fileSize + 1);
+    inputArr = (char *)malloc(fileSize);
     if (inputArr == NULL) {
       printf("Memory allocation failed\n");
       fclose(file);
@@ -359,9 +427,9 @@ int main(int argc, char *argv[]) {
   parser(fileSize, inputArr);
   free(inputArr);
 
-  printf("Token Table:\n");
+  printf("Token List:\n");
   for (int i = 0; i < num_tokens; i++) {
-    printf("%s ", tokenList[i].lexeme);
+    printf("%d ", tokenList[i].type);
   }
 
   return 0;
