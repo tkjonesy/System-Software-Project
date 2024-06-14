@@ -108,9 +108,6 @@ int is_sym(char c) {
   case ';':
     return semicolonsym;
 
-  // case ':=':
-  //   return becomessym;
-
   case ':':
   return 35;
 
@@ -139,7 +136,7 @@ void reset_lexeme(){
 // Push new token to token table and reset curr_token (Jose Porta)
 int tokenize() {
   tokenList[num_tokens] = curr_token;
-  printf("Token added: '%s' %d\n", tokenList[num_tokens].lexeme, tokenList[num_tokens].type);
+  printf("%-15s%d\n", tokenList[num_tokens].lexeme, tokenList[num_tokens].type);
   num_tokens++;
   curr_token.type = 0;
   reset_lexeme();
@@ -158,7 +155,7 @@ void parser(long f_sz, char input_arr[]) {
     char currChar = input_arr[i];
     // Make sure nextChar can't go out of bounds (Trever Jones)
     char nextChar = (i + 1 < f_sz) ? input_arr[i + 1] : '\0';
-    
+
     // Detect comments (Trever Jones)
     if (comment_state == 1) {
       if (currChar == '*' && nextChar == '/') {
@@ -174,6 +171,9 @@ void parser(long f_sz, char input_arr[]) {
         comment_state = 0;
         // Reset position after opening '/*' (Trever Jones)
         i = parser_pos;
+        curr_token.type = slashsym;
+        curr_token.lexeme[strlen(curr_token.lexeme)] = '/';
+        tokenize();
       }
       // Skip other chars while comment is open (Trever Jones)
       continue;
@@ -188,38 +188,6 @@ void parser(long f_sz, char input_arr[]) {
         continue;
       }
     }
-    // printf("comment state: %d\n", comment_state);
-    // switch (currChar) {
-      
-    // case '/':
-    //   if (nextChar == '*') {
-    //     // Comment state active
-    //     comment_state = 1;
-    //     parser_pos = i;
-    //     continue;
-    //   }
-    //   break;
-    // case '*':
-    //   if (nextChar == '/' && comment_state == 1) {
-    //     // Comment state dectivated
-    //     comment_state = 0;
-    //     i += 1;
-    //     continue;
-    //   }
-
-    // default:
-    //   if (comment_state == 1) {
-    //     // Check that there are no more symbols left and comment is still open (Trever Jones)
-    //     if (i == f_sz - 1) {
-    //       printf("Error: Comment opened and not properly closed\n"); 
-    //       comment_state = 0;
-    //       // Reset to the position after the opening '*' (Trever Jones)
-    //       i = parser_pos + 1;
-    //     }
-    //     continue;
-    //   }
-    //   break;
-    // }
 
     switch (state) {
       
@@ -310,6 +278,52 @@ void parser(long f_sz, char input_arr[]) {
       }
 
       break;
+    case lessym:
+      // Handling neqsym (Trever Jones)
+      if (nextChar == '>') {
+        curr_token.type = neqsym;
+        curr_token.lexeme[strlen(curr_token.lexeme)] = currChar;
+        curr_token.lexeme[strlen(curr_token.lexeme)] = '>';
+        tokenize();
+        state = 0;
+        i++;
+        break;
+      }
+      // Handling leqsym (Trever Jones)
+      else if (nextChar == '=') {
+        curr_token.type = leqsym;
+        curr_token.lexeme[strlen(curr_token.lexeme)] = currChar;
+        curr_token.lexeme[strlen(curr_token.lexeme)] = '=';
+        tokenize();
+        state = 0;
+        i++;
+        break;
+      }
+
+      else {
+        curr_token.lexeme[strlen(curr_token.lexeme)] = currChar;
+        tokenize();
+        state = 0;  
+        break;
+      }
+    case gtrsym:
+      // Handling geqsym 
+      if (nextChar == '=') {
+        curr_token.type = geqsym;
+        curr_token.lexeme[strlen(curr_token.lexeme)] = currChar;
+        curr_token.lexeme[strlen(curr_token.lexeme)] = '=';
+        tokenize();
+        state = 0;
+        i++;
+        break;
+      }
+
+      else {
+        curr_token.lexeme[strlen(curr_token.lexeme)] = currChar;
+        tokenize();
+        state = 0;  
+        break;
+      }
     case becomessym:
     case plussym:
     case minussym:
@@ -320,8 +334,6 @@ void parser(long f_sz, char input_arr[]) {
     case eqsym:
     case commasym:
     case periodsym:
-    case lessym:
-    case gtrsym:
     case semicolonsym:
       curr_token.lexeme[strlen(curr_token.lexeme)] = currChar;
       tokenize();
@@ -366,7 +378,7 @@ void parser(long f_sz, char input_arr[]) {
         break;
 
       } else {
-        printf("ERROR: Invalid symbol ':'\n");
+        printf("Error: Invalid symbol: '%s'\n", currChar);
         reset_lexeme();
         state = 0;
       }
@@ -374,7 +386,6 @@ void parser(long f_sz, char input_arr[]) {
     default:
       break;
     }
-    // printf("State: %d, lexeme: %s\n", state, curr_token.lexeme);
   }
 }
 
@@ -382,7 +393,7 @@ int main(int argc, char *argv[]) {
   char *inputArr = NULL;
 
   FILE *file;
-  file = fopen(argv[1], "r");
+  file = fopen(argv[1], "rb");
   long fileSize = 0;
 
   // Checking for correct number of argumnets passed (Trever Jones)
@@ -422,14 +433,20 @@ int main(int argc, char *argv[]) {
 
   printf("Source Program:\n%s\n\n", inputArr);
   printf("Lexeme Table:\n\n");
+  printf("Lexeme Token   Type\n");
 
   // Parse inputArr
   parser(fileSize, inputArr);
   free(inputArr);
 
-  printf("Token List:\n");
+  printf("\nToken List:\n");
   for (int i = 0; i < num_tokens; i++) {
-    printf("%d ", tokenList[i].type);
+    if (tokenList[i].type == identsym || tokenList[i].type == numbersym) {
+      printf("%d %s ", tokenList[i].type, tokenList[i].lexeme);
+    }
+    else {
+      printf("%d ", tokenList[i].type);
+    }
   }
 
   return 0;

@@ -7,8 +7,10 @@ begin
 	w:= w + 1
    else
    /*test */
-   /* no close com
 	w := x;
    fi
+   /*
+   ><<><>>
+   =
 end 
 write w.
