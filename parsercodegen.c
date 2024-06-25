@@ -436,8 +436,18 @@ typedef struct Symbol {
 
 // SYMBOL TABLE(Jose Porta)
 Symbol symbol_table[MAX_SYMBOL_TABLE_SIZE];
+int num_symbols = 0;
 
-int sym_tbl_srch(char string[]);
+int sym_tbl_srch(char string[]) {
+  for (int i = 0; i < num_symbols; i++) {
+    // If matching symbol exists return it's index (i)
+    if (strcmp(string, symbol_table[i].name) == 0) {
+      return i;
+    }
+  }
+  // If no match is found return -1
+  return -1;
+}
 
 // Parsing functions go here
 void PROGRAM();
