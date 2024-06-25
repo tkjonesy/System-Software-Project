@@ -6,34 +6,34 @@ This project is capable of getting the tokens produced by the scanner and passed
 
 EBNF of  tiny PL/0:
 
-program ::= block "." . 
-block ::= const-declaration  var-declaration  statement.	
-constdeclaration ::= [ “const” ident "=" number {"," ident "=" number} “;"].	
-var-declaration  ::= [ "var" ident {"," ident} “;"].
-statement   ::= [ ident ":=" expression
-	      	| "begin" statement { ";" statement } "end" 
-	      	| "if" condition "then" statement "fi"
-		| "while" condition "do" statement
-| "read" ident 
-		| "write"  expression 
-	      	| empty ] .  
-condition ::= "odd" expression 
-	  	| expression  rel-op  expression.  
-rel-op ::= "="|“<>"|"<"|"<="|">"|">=“.
-expression ::=  term { ("+"|"-") term}.
-term ::= factor {("*"|"/") factor}. 
-factor ::= ident | number | "(" expression ")“.
-number ::= digit {digit}.
-ident ::= letter {letter | digit}.
-digit ;;= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9“.
-letter ::= "a" | "b" | … | "y" | "z" | "A" | "B" | ... |"Y" | "Z".
+program ::= block "." . <br>
+block ::= const-declaration  var-declaration  statement.	<br>
+constdeclaration ::= [ “const” ident "=" number {"," ident "=" number} “;"].	<br>
+var-declaration  ::= [ "var" ident {"," ident} “;"].<br>
+statement   ::= [ ident ":=" expression<br>
+	      	| "begin" statement { ";" statement } "end" <br>
+	      	| "if" condition "then" statement "fi"<br>
+		| "while" condition "do" statement<br>
+| "read" ident <br>
+		| "write"  expression <br>
+	      	| empty ] .  <br>
+condition ::= "odd" expression <br>
+	  	| expression  rel-op  expression. <br>
+rel-op ::= "="|“<>"|"<"|"<="|">"|">=“.<br>
+expression ::=  term { ("+"|"-") term}.<br>
+term ::= factor {("*"|"/") factor}. <br>
+factor ::= ident | number | "(" expression ")“.<br>
+number ::= digit {digit}.<br>
+ident ::= letter {letter | digit}.<br>
+digit ;;= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9“.<br>
+letter ::= "a" | "b" | … | "y" | "z" | "A" | "B" | ... |"Y" | "Z".<br>
 
  
-Based on Wirth’s definition for EBNF we have the following rule:
-[ ] means an optional item.
-{ } means repeat 0 or more times.
-Terminal symbols are enclosed in quote marks.
-A period is used to indicate the end of the definition of a syntactic class.
+Based on Wirth’s definition for EBNF we have the following rule:<br>
+[ ] means an optional item.<br>
+{ } means repeat 0 or more times.<br>
+Terminal symbols are enclosed in quote marks.<br>
+A period is used to indicate the end of the definition of a syntactic class.<br>
 
 ## Table of Contents
 
