@@ -14,16 +14,50 @@ Jose Porta
 #define MAX_NUM_LEN 5
 #define TOKEN_TBL_SZ 1000
 
+// Parser macros (Jose Porta)
+#define MAX_SYMBOL_TABLE_SIZE 500
+
 // Token type enum (Jose Porta)
-typedef enum { skipsym = 1, identsym, numbersym, plussym, minussym, multsym, slashsym, fisym, eqsym,
-  neqsym, lessym, leqsym, gtrsym, geqsym, lparentsym, rparentsym, commasym, semicolonsym, periodsym, becomessym,
-  beginsym, endsym, ifsym, thensym, whilesym, dosym, callsym, constsym, varsym, procsym, writesym, readsym, elsesym,
+typedef enum {
+  skipsym = 1,
+  identsym,
+  numbersym,
+  plussym,
+  minussym,
+  multsym,
+  slashsym,
+  fisym,
+  eqsym,
+  neqsym,
+  lessym,
+  leqsym,
+  gtrsym,
+  geqsym,
+  lparentsym,
+  rparentsym,
+  commasym,
+  semicolonsym,
+  periodsym,
+  becomessym,
+  beginsym,
+  endsym,
+  ifsym,
+  thensym,
+  whilesym,
+  dosym,
+  callsym,
+  constsym,
+  varsym,
+  procsym,
+  writesym,
+  readsym,
+  elsesym,
 } token_type;
 
 // Reserved words (Jose Porta)
 char *reserved[] = {"const", "var", "procedure", "call", "begin",
-                    "end",   "if",  "fi", "then", "else",
-                    "while", "do",  "read", "write"};
+                    "end",   "if",  "fi",        "then", "else",
+                    "while", "do",  "read",      "write"};
 int res_enums[] = {constsym, varsym, procsym, callsym, beginsym,
                    endsym,   ifsym,  fisym,   thensym, elsesym,
                    whilesym, dosym,  readsym, writesym};
@@ -78,7 +112,7 @@ int is_sym(char c) {
     return semicolonsym;
 
   case ':':
-  return 35;
+    return 35;
 
   default:
     return 0;
@@ -96,7 +130,7 @@ int is_reserved(char identifier[]) {
 }
 
 // Helper function to set all 11 chars in lexeme to null char
-void reset_lexeme(){
+void reset_lexeme() {
   for (int i = 0; i < MAX_ID_LEN; i++) {
     curr_token.lexeme[i] = '\0';
   }
@@ -105,13 +139,15 @@ void reset_lexeme(){
 // Push new token to token table and reset curr_token (Jose Porta)
 int tokenize() {
   if (curr_token.type == identsym && strlen(curr_token.lexeme) > MAX_ID_LEN) {
-    printf("Error: identifier '%s' execeeds max length (11)\n", curr_token.lexeme);
+    printf("Error: identifier '%s' execeeds max length (11)\n",
+           curr_token.lexeme);
     curr_token.type = 0;
     reset_lexeme();
     return 0;
   }
 
-  else if (curr_token.type == numbersym && strlen(curr_token.lexeme) > MAX_NUM_LEN) {
+  else if (curr_token.type == numbersym &&
+           strlen(curr_token.lexeme) > MAX_NUM_LEN) {
     printf("Error: number '%s' execeeds max length (5)\n", curr_token.lexeme);
     curr_token.type = 0;
     reset_lexeme();
@@ -125,7 +161,6 @@ int tokenize() {
   reset_lexeme();
   return 0;
 }
-
 
 // Main parsing loop (Jose Porta)
 void parser(long f_sz, char input_arr[]) {
@@ -148,9 +183,10 @@ void parser(long f_sz, char input_arr[]) {
         i++;
         continue;
       }
-      // Check that there are no more symbols left and comment is still open (Trever Jones)
+      // Check that there are no more symbols left and comment is still open
+      // (Trever Jones)
       if (i == f_sz - 1) {
-        printf("Error: Comment opened and not properly closed\n"); 
+        printf("Error: Comment opened and not properly closed\n");
         comment_state = 0;
         // Reset position after opening '/*' (Trever Jones)
         i = parser_pos;
@@ -160,8 +196,7 @@ void parser(long f_sz, char input_arr[]) {
       }
       // Skip other chars while comment is open (Trever Jones)
       continue;
-    }
-    else {
+    } else {
       // Comment is opened (Trever Jones)
       if (currChar == '/' && nextChar == '*') {
         comment_state = 1;
@@ -173,7 +208,7 @@ void parser(long f_sz, char input_arr[]) {
     }
 
     switch (state) {
-      
+
     case 0:
       // If currChar is a letter -> state = identifier
       if (isalpha(currChar)) {
@@ -223,7 +258,6 @@ void parser(long f_sz, char input_arr[]) {
     case identsym:
       // identifiers have the form: letter(letter | digit)*
       // Add char to identifier name
-      
 
       if (isalpha(currChar) || isdigit(currChar)) {
         curr_token.lexeme[strlen(curr_token.lexeme)] = currChar;
@@ -242,7 +276,6 @@ void parser(long f_sz, char input_arr[]) {
             break;
           }
         }
-        
       }
 
       // Non alpha-numeric value implies end of identifier
@@ -288,11 +321,11 @@ void parser(long f_sz, char input_arr[]) {
       else {
         curr_token.lexeme[strlen(curr_token.lexeme)] = currChar;
         tokenize();
-        state = 0;  
+        state = 0;
         break;
       }
     case gtrsym:
-      // Handling geqsym 
+      // Handling geqsym
       if (nextChar == '=') {
         curr_token.type = geqsym;
         curr_token.lexeme[strlen(curr_token.lexeme)] = currChar;
@@ -306,7 +339,7 @@ void parser(long f_sz, char input_arr[]) {
       else {
         curr_token.lexeme[strlen(curr_token.lexeme)] = currChar;
         tokenize();
-        state = 0;  
+        state = 0;
         break;
       }
     case becomessym:
@@ -322,7 +355,7 @@ void parser(long f_sz, char input_arr[]) {
     case semicolonsym:
       curr_token.lexeme[strlen(curr_token.lexeme)] = currChar;
       tokenize();
-      state = 0;  
+      state = 0;
       break;
     case constsym:
     case varsym:
@@ -355,8 +388,7 @@ void parser(long f_sz, char input_arr[]) {
       }
       // ':' symbol
     case 35:
-      if (nextChar == '=')
-      {
+      if (nextChar == '=') {
         curr_token.lexeme[strlen(curr_token.lexeme)] = currChar;
         curr_token.type = becomessym;
         state = becomessym;
@@ -367,12 +399,56 @@ void parser(long f_sz, char input_arr[]) {
         reset_lexeme();
         state = 0;
       }
-      
+
     default:
       break;
     }
   }
 }
+/* END OF SCANNER */
+/*
+EMPTY
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
+
+// Symbol struct (Jose Porta)
+typedef struct Symbol {
+  int kind;      // const = 1, var = 2, proc = 3
+  char name[10]; // name up to 11 chars
+  int val;       // number (ASCII value)
+  int level;     // L level
+  int addr;      // M address
+  int mark       // to indicate unavailable or deleted
+} Symbol;
+
+// SYMBOL TABLE(Jose Porta)
+Symbol symbol_table[MAX_SYMBOL_TABLE_SIZE];
+
+int sym_tbl_srch(char string[]);
+
+// Parsing functions go here
+void PROGRAM();
+void BLOCK();
+void CONST_DECL();
+void VAR_DECL();
+void STATEMENT();
+void CONDITION();
+void EXPRESSION();
+void TERM();
+void FACTOR();
 
 int main(int argc, char *argv[]) {
   char *inputArr = NULL;
@@ -428,8 +504,7 @@ int main(int argc, char *argv[]) {
   for (int i = 0; i < num_tokens; i++) {
     if (tokenList[i].type == identsym || tokenList[i].type == numbersym) {
       printf("%d %s ", tokenList[i].type, tokenList[i].lexeme);
-    }
-    else {
+    } else {
       printf("%d ", tokenList[i].type);
     }
   }
