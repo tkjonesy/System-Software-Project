@@ -1,6 +1,7 @@
 .xvar w, x, 5;
 read w;
-begin
+beginy
+555555
    x:= 4;
    /* testing */
    if w > x then

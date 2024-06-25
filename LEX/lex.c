@@ -15,40 +15,9 @@ Jose Porta
 #define TOKEN_TBL_SZ 1000
 
 // Token type enum (Jose Porta)
-typedef enum {
-  skipsym = 1,
-  identsym,
-  numbersym,
-  plussym,
-  minussym,
-  multsym,
-  slashsym,
-  fisym,
-  eqsym,
-  neqsym,
-  lessym,
-  leqsym,
-  gtrsym,
-  geqsym,
-  lparentsym,
-  rparentsym,
-  commasym,
-  semicolonsym,
-  periodsym,
-  becomessym,
-  beginsym,
-  endsym,
-  ifsym,
-  thensym,
-  whilesym,
-  dosym,
-  callsym,
-  constsym,
-  varsym,
-  procsym,
-  writesym,
-  readsym,
-  elsesym,
+typedef enum { skipsym = 1, identsym, numbersym, plussym, minussym, multsym, slashsym, fisym, eqsym,
+  neqsym, lessym, leqsym, gtrsym, geqsym, lparentsym, rparentsym, commasym, semicolonsym, periodsym, becomessym,
+  beginsym, endsym, ifsym, thensym, whilesym, dosym, callsym, constsym, varsym, procsym, writesym, readsym, elsesym,
 } token_type;
 
 // Reserved words (Jose Porta)
@@ -62,7 +31,7 @@ int res_enums[] = {constsym, varsym, procsym, callsym, beginsym,
 // Token struct (Jose Porta)
 typedef struct Token {
   token_type type;
-  char lexeme[MAX_ID_LEN + 1];
+  char lexeme[100];
 } Token;
 Token curr_token = {0, ""};
 // Token Table
@@ -135,6 +104,20 @@ void reset_lexeme(){
 
 // Push new token to token table and reset curr_token (Jose Porta)
 int tokenize() {
+  if (curr_token.type == identsym && strlen(curr_token.lexeme) > MAX_ID_LEN) {
+    printf("Error: identifier '%s' execeeds max length (11)\n", curr_token.lexeme);
+    curr_token.type = 0;
+    reset_lexeme();
+    return 0;
+  }
+
+  else if (curr_token.type == numbersym && strlen(curr_token.lexeme) > MAX_NUM_LEN) {
+    printf("Error: number '%s' execeeds max length (5)\n", curr_token.lexeme);
+    curr_token.type = 0;
+    reset_lexeme();
+    return 0;
+  }
+
   tokenList[num_tokens] = curr_token;
   printf("%-15s%d\n", tokenList[num_tokens].lexeme, tokenList[num_tokens].type);
   num_tokens++;
@@ -246,9 +229,18 @@ void parser(long f_sz, char input_arr[]) {
         curr_token.lexeme[strlen(curr_token.lexeme)] = currChar;
         // Check if identifier is a reserved word (returns identsym if not)
         state = is_reserved(curr_token.lexeme);
-        if (state != identsym){
-          i--;
-          break;
+        if (state != identsym) {
+
+          if (!isalpha(nextChar) && !isdigit(nextChar)) {
+            i--;
+            break;
+          }
+
+          // reserved word inside an identifier (Trever Jones)
+          else {
+            state = identsym;
+            break;
+          }
         }
         
       }
@@ -259,19 +251,12 @@ void parser(long f_sz, char input_arr[]) {
 
         break;
       }
-      if (strlen(curr_token.lexeme) > MAX_ID_LEN) {
-        printf("Error: identifier %s execeeds max length (11)",
-               curr_token.lexeme);
-      }
+
       break;
 
     case numbersym:
       curr_token.lexeme[strlen(curr_token.lexeme)] = currChar;
 
-      // NOTE: how to handle numbers >5 digits?
-      if (strlen(curr_token.lexeme) > MAX_NUM_LEN) {
-        printf("Error: number %s execeeds max length (5)", curr_token.lexeme);
-      }
       if (!isdigit(nextChar)) {
         tokenize();
         state = 0;
