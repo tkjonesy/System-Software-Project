@@ -2,7 +2,7 @@
 
 ## Description
 
-This project is capable of getting the tokens produced by the scanner and passed to the parser to check syntax, populate a symbol table, and output an ISA to pass to the virtual machine created in HW1.
+This project takes the tokens produced by the scanner and passed to the parser to check syntax, populate a symbol table, and output an ISA to pass to the virtual machine created in HW1.
 
 EBNF of  tiny PL/0:
 
