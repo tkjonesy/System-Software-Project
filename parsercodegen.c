@@ -71,6 +71,8 @@ Token curr_token = {0, ""};
 // Token Table
 Token tokenList[TOKEN_TBL_SZ];
 int num_tokens = 0;
+// Index for the parser (Trever Jones)
+int parserPos = 0;
 
 // Determine Special Symbol type
 int is_sym(char c) {
@@ -456,7 +458,7 @@ int sym_tbl_srch(char string[]) {
   return -1;
 }
 
-// Parsing functions go here
+// Parsing functions (Trever Jones / Jose Porta)
 void PROGRAM();
 void BLOCK();
 void CONST_DECL();
@@ -466,6 +468,11 @@ void CONDITION();
 void EXPRESSION();
 void TERM();
 void FACTOR();
+
+// Function for fetching next token (Trever Jones)
+int getNextToken () {
+  return tokenList[parserPos++].type;
+}
 
 int main(int argc, char *argv[]) {
   char *inputArr = NULL;
