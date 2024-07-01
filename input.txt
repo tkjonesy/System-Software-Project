@@ -1,6 +1,7 @@
 .xvar w, x, 5;
 read w;
 beginy
+odd
 55555
    x:= 4;
    /* testing */

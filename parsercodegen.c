@@ -19,7 +19,7 @@ Jose Porta
 
 // Token type enum (Jose Porta)
 typedef enum {
-  skipsym = 1,
+  oddsym = 1,
   identsym,
   numbersym,
   plussym,
@@ -55,10 +55,10 @@ typedef enum {
 } token_type;
 
 // Reserved words (Jose Porta)
-char *reserved[] = {"const", "var", "begin",
+char *reserved[] = {"odd", "const", "var", "begin",
                     "end",   "if",  "fi",        "then",
                     "while", "do",  "read",      "write"};
-int res_enums[] = {constsym, varsym, beginsym,
+int res_enums[] = {oddsym, constsym, varsym, beginsym,
                    endsym,   ifsym,  fisym, thensym,
                    whilesym, dosym,  readsym, writesym};
 
@@ -121,7 +121,7 @@ int is_sym(char c) {
 
 // Checks if indentifier is a reserved word and if so, returns its type
 int is_reserved(char identifier[]) {
-  for (int i = 0; i < 11; i++) {
+  for (int i = 0; i < 12; i++) {
     if (strcmp(reserved[i], identifier) == 0) {
       return res_enums[i];
     }
@@ -361,6 +361,7 @@ void parser(long f_sz, char input_arr[]) {
       tokenize();
       state = 0;
       break;
+    case oddsym:
     case constsym:
     case varsym:
     case procsym:
