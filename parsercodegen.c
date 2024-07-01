@@ -458,9 +458,94 @@ int sym_tbl_srch(char string[]) {
   return -1;
 }
 
+// Function for fetching next token (Trever Jones)
+int getNextToken () {
+  return tokenList[parserPos++].type;
+}
+
+// Parser error enumeration (Trever Jones)
+typedef enum {
+  missingPeriod = 1,
+  declareMissingIden,
+  symbolTaken,
+  constMissingEqual,
+  constMissingInt,
+  declareMissingSemicolon,
+  undefinedInden,
+  ConstAltered,
+  missingBecomesym,
+  beginMissingEnd,
+  ifMissingThen,
+  whileMissingDo,
+  conditionMissingOper,
+  unclosedParenth,
+  arithmeticError
+} errorCode;
+
+// Error handling (Trever Jones)
+void error (errorCode error) {
+  switch (error){
+    case missingPeriod:
+    printf("Error: program must end with period\n");
+    exit(1);
+    case declareMissingIden:
+    printf("Error: const, var, and read keywords must be followed by identifier\n");
+    exit(1);
+    case symbolTaken:
+    printf("Error: symbol name has already been declared\n");
+    exit(1);
+    case constMissingEqual:
+    printf("Error: constants must be assigned with =\n");
+    exit(1);
+    case constMissingInt:
+    printf("Error: constants must be assigned an integer value\n");
+    exit(1);
+    case declareMissingSemicolon:
+    printf("Error: constant and variable declarations must be followed by a semicolon\n");
+    exit(1);
+    case undefinedInden:
+    printf("Error: undeclared identifier\n");
+    exit(1);
+    case ConstAltered:
+    printf("Error: only variable values may be altered\n");
+    exit(1);
+    case missingBecomesym:
+    printf("Error: assignment statements must use :=\n");
+    exit(1);
+    case beginMissingEnd:
+    printf("Error: begin must be followed by end\n");
+    exit(1);
+    case ifMissingThen:
+    printf("Error: if must be followed by then\n");
+    exit(1);
+    case whileMissingDo:
+    printf("Error: while must be followed by do\n");
+    exit(1);
+    case conditionMissingOper:
+    printf("Error: condition must contain comparison operator\n");
+    exit(1);
+    case unclosedParenth:
+    printf("Error: right parenthesis must follow left parenthesis\n");
+    exit(1);
+    case arithmeticError:
+    printf("Error: arithmetic equations must contain operands, parentheses, numbers, or symbols\n");
+    exit(1);
+    default:
+    printf("Undefined error %d\n", error);
+    exit(1);
+  }
+}
+
 // Parsing functions (Trever Jones / Jose Porta)
-void PROGRAM();
-void BLOCK();
+void PROGRAM() {
+  int token;
+  BLOCK();
+  token = getNextToken();
+  if (token != periodsym) {
+    error(1);
+  }
+}
+void BLOCK() {}
 void CONST_DECL();
 void VAR_DECL();
 void STATEMENT();
@@ -468,11 +553,6 @@ void CONDITION();
 void EXPRESSION();
 void TERM();
 void FACTOR();
-
-// Function for fetching next token (Trever Jones)
-int getNextToken () {
-  return tokenList[parserPos++].type;
-}
 
 int main(int argc, char *argv[]) {
   char *inputArr = NULL;
@@ -532,6 +612,9 @@ int main(int argc, char *argv[]) {
       printf("%d ", tokenList[i].type);
     }
   }
+  printf("\n");
+
+  PROGRAM();
 
   return 0;
 }

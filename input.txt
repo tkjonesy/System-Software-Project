@@ -1,17 +1,1 @@
-.xvar w, x, 5;
-read w;
-beginy
-odd
-55555
-   x:= 4;
-   /* testing */
-   if w > x then
-	w:= w + 1
-   else
-   /*test */
-	w := x;
-   fi
-   ><<><>>
-   =
-end 
-write w.
+.
