@@ -55,11 +55,11 @@ typedef enum {
 } token_type;
 
 // Reserved words (Jose Porta)
-char *reserved[] = {"const", "var", "procedure", "call", "begin",
-                    "end",   "if",  "fi",        "then", "else",
+char *reserved[] = {"const", "var", "begin",
+                    "end",   "if",  "fi",        "then",
                     "while", "do",  "read",      "write"};
-int res_enums[] = {constsym, varsym, procsym, callsym, beginsym,
-                   endsym,   ifsym,  fisym,   thensym, elsesym,
+int res_enums[] = {constsym, varsym, beginsym,
+                   endsym,   ifsym,  fisym, thensym,
                    whilesym, dosym,  readsym, writesym};
 
 // Token struct (Jose Porta)
@@ -121,7 +121,7 @@ int is_sym(char c) {
 
 // Checks if indentifier is a reserved word and if so, returns its type
 int is_reserved(char identifier[]) {
-  for (int i = 0; i < 14; i++) {
+  for (int i = 0; i < 11; i++) {
     if (strcmp(reserved[i], identifier) == 0) {
       return res_enums[i];
     }
@@ -141,6 +141,7 @@ int tokenize() {
   if (curr_token.type == identsym && strlen(curr_token.lexeme) > MAX_ID_LEN) {
     printf("Error: identifier '%s' execeeds max length (11)\n",
            curr_token.lexeme);
+    exit(1);
     curr_token.type = 0;
     reset_lexeme();
     return 0;
@@ -149,6 +150,7 @@ int tokenize() {
   else if (curr_token.type == numbersym &&
            strlen(curr_token.lexeme) > MAX_NUM_LEN) {
     printf("Error: number '%s' execeeds max length (5)\n", curr_token.lexeme);
+    exit(1);
     curr_token.type = 0;
     reset_lexeme();
     return 0;
@@ -187,6 +189,7 @@ void parser(long f_sz, char input_arr[]) {
       // (Trever Jones)
       if (i == f_sz - 1) {
         printf("Error: Comment opened and not properly closed\n");
+        exit(1);
         comment_state = 0;
         // Reset position after opening '/*' (Trever Jones)
         i = parser_pos;
@@ -251,6 +254,7 @@ void parser(long f_sz, char input_arr[]) {
       else {
         state = 0;
         printf("Error: Invalid symbol: '%s'\n", currChar);
+        exit(1);
         reset_lexeme();
       }
       break;
@@ -396,6 +400,7 @@ void parser(long f_sz, char input_arr[]) {
 
       } else {
         printf("Error: Invalid symbol: '%s'\n", currChar);
+        exit(1);
         reset_lexeme();
         state = 0;
       }
