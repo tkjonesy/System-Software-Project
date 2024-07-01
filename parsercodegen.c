@@ -412,8 +412,8 @@ void parser(long f_sz, char input_arr[]) {
   }
 }
 /* END OF SCANNER */
+
 /*
-EMPTY
 
 
 
@@ -421,6 +421,7 @@ EMPTY
 
 
 
+START OF PARSER
 
 
 
@@ -437,7 +438,7 @@ typedef struct Symbol {
   int val;       // number (ASCII value)
   int level;     // L level
   int addr;      // M address
-  int mark       // to indicate unavailable or deleted
+  int mark;       // to indicate unavailable or deleted
 } Symbol;
 
 // SYMBOL TABLE(Jose Porta)
