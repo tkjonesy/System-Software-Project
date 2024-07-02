@@ -74,6 +74,16 @@ int num_tokens = 0;
 // Index for the parser (Trever Jones)
 int parserPos = 0;
 
+// Instruction set architecture (Trever Jones)
+int cx = 0;
+typedef struct Instructions {
+  int OP;
+  int L;
+  int M;
+} Instructions;
+
+Instructions instructionList[500];
+
 // Determine Special Symbol type
 int is_sym(char c) {
   switch (c) {
@@ -536,6 +546,19 @@ void error (errorCode error) {
   }
 }
 
+void emit(int OP, int L, int M) {
+  if (cx > 500) {
+    printf("Error: code too long\n");
+  }
+
+  else {
+    instructionList[cx].OP = OP;
+    instructionList[cx].L = L;
+    instructionList[cx].M = M;
+    cx++;
+  }
+}
+
 // Parsing functions (Trever Jones / Jose Porta)
 void PROGRAM() {
   int token;
@@ -545,9 +568,12 @@ void PROGRAM() {
     error(1);
   }
 }
-void BLOCK() {}
+void BLOCK() {
+  CONST_DECL();
+  int numVars = VAR_DECL(); 
+}
 void CONST_DECL();
-void VAR_DECL();
+int VAR_DECL();
 void STATEMENT();
 void CONDITION();
 void EXPRESSION();
