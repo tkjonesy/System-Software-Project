@@ -564,7 +564,7 @@ void emit(int OP, int L, int M) {
   }
 }
 
-// Parsing functions (Trever Jones / Jose Porta)
+// Grammer functions (Trever Jones / Jose Porta)
 void PROGRAM() {
   Token token;
   BLOCK();
@@ -580,7 +580,51 @@ void BLOCK() {
   emit(INC, 0, (3 + numVars));
   STATEMENT();
 }
-void CONST_DECL() {}
+
+void CONST_DECL() {
+  Token token = getNextToken();
+
+  if (token.type == constsym) {
+
+    do {
+      token = getNextToken();
+
+      if (token.type != identsym) {
+        error(declareMissingIden);
+      }
+      if (sym_tbl_srch(token.lexeme) != -1) {
+        error(symbolTaken);
+      }
+
+      // Save const identifier (Trever Jones)
+      char iden[10];
+      strcpy(iden, token.lexeme);
+
+      token = getNextToken();
+      if (token.type != eqsym) {
+        error(constMissingEqual);
+      }
+
+      token = getNextToken();
+      if (token.type != numbersym) {
+        error(constMissingInt);
+      }
+
+      // Add const to symbol table (Trever Jones)
+      symbol_table[num_symbols].kind = 1;
+      strcpy(symbol_table[num_symbols].name, iden);
+      symbol_table[num_symbols].val = atoi(token.lexeme);
+      symbol_table[num_symbols].mark = 0;
+      num_symbols++;
+
+      token = getNextToken();
+    } while (token.type == commasym);
+
+    if (token.type != semicolonsym) {
+      error(declareMissingSemicolon);
+    }
+  }
+}
 int VAR_DECL() {}
 void STATEMENT() {}
 void CONDITION() {}
