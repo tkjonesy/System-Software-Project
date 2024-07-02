@@ -445,6 +445,8 @@ START OF PARSER
 
 */
 
+// Debug mode switch (prints extra details)
+int debug = 1;
 // Symbol struct (Jose Porta)
 typedef struct Symbol {
   int kind;      // const = 1, var = 2, proc = 3
@@ -471,7 +473,12 @@ int sym_tbl_srch(char string[]) {
 }
 
 // Function for fetching next token (Trever Jones)
-Token getNextToken() { return tokenList[parserPos++]; }
+void getNextToken() {
+  curr_token = tokenList[parserPos++];
+  if (debug == 1) {
+    printf("%s\n", curr_token.lexeme);
+  }
+}
 
 // Parser error enumeration (Trever Jones)
 typedef enum {
@@ -572,77 +579,88 @@ void TERM() {}
 void FACTOR() {}
 
 int VAR_DECL() {
-  Token token = getNextToken();
+  // printf("%s\n", curr_token.lexeme);
   int num_vars = 0;
-  if (token.type == varsym) {
+  if (curr_token.type == varsym) {
+
     do {
       num_vars++;
-      token = getNextToken();
-      if (token.type != identsym) {
+      getNextToken();
+      if (curr_token.type != identsym) {
+        printf("%s", curr_token.lexeme);
         error(declareMissingIden);
       }
 
-      int ident_idx = sym_tbl_srch(token.lexeme);
+      int ident_idx = sym_tbl_srch(curr_token.lexeme);
       if (ident_idx != -1) {
         error(symbolTaken);
       }
 
       // Add variable to symbol table (Jose Porta)
       symbol_table[num_symbols].kind = 2;
-      strcpy(symbol_table[num_symbols].name, token.lexeme);
+      strcpy(symbol_table[num_symbols].name, curr_token.lexeme);
       symbol_table[num_symbols].val = 0;
       symbol_table[num_symbols].level = 0;
       symbol_table[num_symbols].addr = num_vars + 2;
       symbol_table[num_symbols].mark = 0;
       num_symbols++;
-      token = getNextToken();
+      getNextToken();
 
-    } while (token.type == commasym);
+    } while (curr_token.type == commasym);
+    if (curr_token.type != semicolonsym) {
+      error(declareMissingSemicolon);
+    }
+    getNextToken();
+    if (debug == 1) {
+      for (int i = 3; i < num_symbols; i++) {
+        printf("%d %s %d %d %d %d\n", symbol_table[i].kind,
+               symbol_table[i].name, symbol_table[i].val, symbol_table[i].level,
+               symbol_table[i].addr, symbol_table[i].mark);
+      }
+    }
   }
 
   return num_vars;
 }
 
 void CONST_DECL() {
-  Token token = getNextToken();
-
-  if (token.type == constsym) {
+  if (curr_token.type == constsym) {
 
     do {
-      token = getNextToken();
+      getNextToken();
 
-      if (token.type != identsym) {
+      if (curr_token.type != identsym) {
         error(declareMissingIden);
       }
-      if (sym_tbl_srch(token.lexeme) != -1) {
+      if (sym_tbl_srch(curr_token.lexeme) != -1) {
         error(symbolTaken);
       }
 
       // Save const identifier (Trever Jones)
       char iden[10];
-      strcpy(iden, token.lexeme);
+      strcpy(iden, curr_token.lexeme);
 
-      token = getNextToken();
-      if (token.type != eqsym) {
+      getNextToken();
+      if (curr_token.type != eqsym) {
         error(constMissingEqual);
       }
 
-      token = getNextToken();
-      if (token.type != numbersym) {
+      getNextToken();
+      if (curr_token.type != numbersym) {
         error(constMissingInt);
       }
 
       // Add const to symbol table (Trever Jones)
       symbol_table[num_symbols].kind = 1;
       strcpy(symbol_table[num_symbols].name, iden);
-      symbol_table[num_symbols].val = atoi(token.lexeme);
+      symbol_table[num_symbols].val = atoi(curr_token.lexeme);
       symbol_table[num_symbols].mark = 0;
       num_symbols++;
 
-      token = getNextToken();
-    } while (token.type == commasym);
+      getNextToken();
+    } while (curr_token.type == commasym);
 
-    if (token.type != semicolonsym) {
+    if (curr_token.type != semicolonsym) {
       error(declareMissingSemicolon);
     }
   }
@@ -656,10 +674,10 @@ void BLOCK() {
 }
 
 void PROGRAM() {
-  Token token;
+  getNextToken();
   BLOCK();
-  token = getNextToken();
-  if (token.type != periodsym) {
+  getNextToken();
+  if (curr_token.type != periodsym) {
     error(1);
   }
 }
