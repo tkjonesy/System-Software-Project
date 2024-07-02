@@ -611,13 +611,6 @@ int VAR_DECL() {
       error(declareMissingSemicolon);
     }
     getNextToken();
-    if (debug == 1) {
-      for (int i = 3; i < num_symbols; i++) {
-        printf("%d %s %d %d %d %d\n", symbol_table[i].kind,
-               symbol_table[i].name, symbol_table[i].val, symbol_table[i].level,
-               symbol_table[i].addr, symbol_table[i].mark);
-      }
-    }
   }
 
   return num_vars;
@@ -663,6 +656,7 @@ void CONST_DECL() {
     if (curr_token.type != semicolonsym) {
       error(declareMissingSemicolon);
     }
+    getNextToken();
   }
 }
 
@@ -676,7 +670,7 @@ void BLOCK() {
 void PROGRAM() {
   getNextToken();
   BLOCK();
-  getNextToken();
+  // getNextToken();
   if (curr_token.type != periodsym) {
     error(1);
   }
