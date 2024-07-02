@@ -563,21 +563,44 @@ void emit(int OP, int L, int M) {
   }
 }
 
-// Grammer functions (Trever Jones / Jose Porta)
-void PROGRAM() {
-  Token token;
-  BLOCK();
-  token = getNextToken();
-  if (token.type != periodsym) {
-    error(1);
-  }
-}
+// Grammar functions (Trever Jones / Jose Porta)
 
-void BLOCK() {
-  CONST_DECL();
-  int numVars = VAR_DECL();
-  emit(INC, 0, (3 + numVars));
-  STATEMENT();
+void STATEMENT() {}
+void CONDITION() {}
+void EXPRESSION() {}
+void TERM() {}
+void FACTOR() {}
+
+int VAR_DECL() {
+  Token token = getNextToken();
+  int num_vars = 0;
+  if (token.type == varsym) {
+    do {
+      num_vars++;
+      token = getNextToken();
+      if (token.type != identsym) {
+        error(declareMissingIden);
+      }
+
+      int ident_idx = sym_tbl_srch(token.lexeme);
+      if (ident_idx != -1) {
+        error(symbolTaken);
+      }
+
+      // Add variable to symbol table (Jose Porta)
+      symbol_table[num_symbols].kind = 2;
+      strcpy(symbol_table[num_symbols].name, token.lexeme);
+      symbol_table[num_symbols].val = 0;
+      symbol_table[num_symbols].level = 0;
+      symbol_table[num_symbols].addr = num_vars + 2;
+      symbol_table[num_symbols].mark = 0;
+      num_symbols++;
+      token = getNextToken();
+
+    } while (token.type == commasym);
+  }
+
+  return num_vars;
 }
 
 void CONST_DECL() {
@@ -625,42 +648,21 @@ void CONST_DECL() {
   }
 }
 
-int VAR_DECL() {
-  Token token = getNextToken();
-  int num_vars = 0;
-  if (token.type == varsym) {
-    do {
-      num_vars++;
-      token = getNextToken();
-      if (token.type != identsym) {
-        error(declareMissingIden);
-      }
-
-      int ident_idx = sym_tbl_srch(token.lexeme);
-      if (ident_idx != -1) {
-        error(symbolTaken);
-      }
-
-      // Add variable to symbol table (Jose Porta)
-      symbol_table[num_symbols].kind = 2;
-      strcpy(symbol_table[num_symbols].name, token.lexeme);
-      symbol_table[num_symbols].val = 0;
-      symbol_table[num_symbols].level = 0;
-      symbol_table[num_symbols].addr = num_vars + 2;
-      symbol_table[num_symbols].mark = 0;
-      num_symbols++;
-      token = getNextToken();
-
-    } while (token.type == commasym);
-  }
-
-  return num_vars;
+void BLOCK() {
+  CONST_DECL();
+  int numVars = VAR_DECL();
+  emit(INC, 0, (3 + numVars));
+  STATEMENT();
 }
-void STATEMENT() {}
-void CONDITION() {}
-void EXPRESSION() {}
-void TERM() {}
-void FACTOR() {}
+
+void PROGRAM() {
+  Token token;
+  BLOCK();
+  token = getNextToken();
+  if (token.type != periodsym) {
+    error(1);
+  }
+}
 
 int main(int argc, char *argv[]) {
   char *inputArr = NULL;
