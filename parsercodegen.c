@@ -59,12 +59,10 @@ typedef enum {
 } token_type;
 
 // Reserved words (Jose Porta)
-char *reserved[] = {"odd", "const", "var", "begin",
-                    "end",   "if",  "fi",        "then",
-                    "while", "do",  "read",      "write"};
-int res_enums[] = {oddsym, constsym, varsym, beginsym,
-                   endsym,   ifsym,  fisym, thensym,
-                   whilesym, dosym,  readsym, writesym};
+char *reserved[] = {"odd", "const", "var",   "begin", "end",  "if",
+                    "fi",  "then",  "while", "do",    "read", "write"};
+int res_enums[] = {oddsym, constsym, varsym,   beginsym, endsym,  ifsym,
+                   fisym,  thensym,  whilesym, dosym,    readsym, writesym};
 
 // Token struct (Jose Porta)
 typedef struct Token {
@@ -454,7 +452,7 @@ typedef struct Symbol {
   int val;       // number (ASCII value)
   int level;     // L level
   int addr;      // M address
-  int mark;       // to indicate unavailable or deleted
+  int mark;      // to indicate unavailable or deleted
 } Symbol;
 
 // SYMBOL TABLE(Jose Porta)
@@ -473,9 +471,7 @@ int sym_tbl_srch(char string[]) {
 }
 
 // Function for fetching next token (Trever Jones)
-Token getNextToken () {
-  return tokenList[parserPos++];
-}
+Token getNextToken() { return tokenList[parserPos++]; }
 
 // Parser error enumeration (Trever Jones)
 typedef enum {
@@ -497,54 +493,57 @@ typedef enum {
 } errorCode;
 
 // Error handling (Trever Jones)
-void error (errorCode error) {
-  switch (error){
-    case missingPeriod:
+void error(errorCode error) {
+  switch (error) {
+  case missingPeriod:
     printf("Error: program must end with period\n");
     exit(1);
-    case declareMissingIden:
-    printf("Error: const, var, and read keywords must be followed by identifier\n");
+  case declareMissingIden:
+    printf("Error: const, var, and read keywords must be followed by "
+           "identifier\n");
     exit(1);
-    case symbolTaken:
+  case symbolTaken:
     printf("Error: symbol name has already been declared\n");
     exit(1);
-    case constMissingEqual:
+  case constMissingEqual:
     printf("Error: constants must be assigned with =\n");
     exit(1);
-    case constMissingInt:
+  case constMissingInt:
     printf("Error: constants must be assigned an integer value\n");
     exit(1);
-    case declareMissingSemicolon:
-    printf("Error: constant and variable declarations must be followed by a semicolon\n");
+  case declareMissingSemicolon:
+    printf("Error: constant and variable declarations must be followed by a "
+           "semicolon\n");
     exit(1);
-    case undefinedInden:
+  case undefinedInden:
     printf("Error: undeclared identifier\n");
     exit(1);
-    case ConstAltered:
+  case ConstAltered:
     printf("Error: only variable values may be altered\n");
     exit(1);
-    case missingBecomesym:
+  case missingBecomesym:
     printf("Error: assignment statements must use :=\n");
     exit(1);
-    case beginMissingEnd:
+  case beginMissingEnd:
     printf("Error: begin must be followed by end\n");
     exit(1);
-    case ifMissingThen:
+  case ifMissingThen:
     printf("Error: if must be followed by then\n");
     exit(1);
-    case whileMissingDo:
+  case whileMissingDo:
     printf("Error: while must be followed by do\n");
     exit(1);
-    case conditionMissingOper:
+  case conditionMissingOper:
     printf("Error: condition must contain comparison operator\n");
     exit(1);
-    case unclosedParenth:
+  case unclosedParenth:
     printf("Error: right parenthesis must follow left parenthesis\n");
     exit(1);
-    case arithmeticError:
-    printf("Error: arithmetic equations must contain operands, parentheses, numbers, or symbols\n");
+  case arithmeticError:
+    printf("Error: arithmetic equations must contain operands, parentheses, "
+           "numbers, or symbols\n");
     exit(1);
-    default:
+  default:
     printf("Undefined error %d\n", error);
     exit(1);
   }
@@ -625,7 +624,38 @@ void CONST_DECL() {
     }
   }
 }
-int VAR_DECL() {}
+
+int VAR_DECL() {
+  Token token = getNextToken();
+  int num_vars = 0;
+  if (token.type == varsym) {
+    do {
+      num_vars++;
+      token = getNextToken();
+      if (token.type != identsym) {
+        error(declareMissingIden);
+      }
+
+      int ident_idx = sym_tbl_srch(token.lexeme);
+      if (ident_idx != -1) {
+        error(symbolTaken);
+      }
+
+      // Add variable to symbol table (Jose Porta)
+      symbol_table[num_symbols].kind = 2;
+      strcpy(symbol_table[num_symbols].name, token.lexeme);
+      symbol_table[num_symbols].val = 0;
+      symbol_table[num_symbols].level = 0;
+      symbol_table[num_symbols].addr = num_vars + 2;
+      symbol_table[num_symbols].mark = 0;
+      num_symbols++;
+      token = getNextToken();
+
+    } while (token.type == commasym);
+  }
+
+  return num_vars;
+}
 void STATEMENT() {}
 void CONDITION() {}
 void EXPRESSION() {}
