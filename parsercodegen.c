@@ -17,6 +17,10 @@ Jose Porta
 // Parser macros (Jose Porta)
 #define MAX_SYMBOL_TABLE_SIZE 500
 
+// Instruction and Opr. enums (Jose Porta)
+enum Instruct { LIT = 1, OPR, LOD, STO, CAL, INC, JMP, JPC, SYS };
+enum Oprs { RTN = 0, ADD, SUB, MUL, DIV, EQL, NEQ, LSS, LEQ, GTR, GEQ };
+
 // Token type enum (Jose Porta)
 typedef enum {
   oddsym = 1,
@@ -469,8 +473,8 @@ int sym_tbl_srch(char string[]) {
 }
 
 // Function for fetching next token (Trever Jones)
-int getNextToken () {
-  return tokenList[parserPos++].type;
+Token getNextToken () {
+  return tokenList[parserPos++];
 }
 
 // Parser error enumeration (Trever Jones)
@@ -546,6 +550,7 @@ void error (errorCode error) {
   }
 }
 
+// Emit instruction function (Trever Jones)
 void emit(int OP, int L, int M) {
   if (cx > 500) {
     printf("Error: code too long\n");
@@ -561,24 +566,27 @@ void emit(int OP, int L, int M) {
 
 // Parsing functions (Trever Jones / Jose Porta)
 void PROGRAM() {
-  int token;
+  Token token;
   BLOCK();
   token = getNextToken();
-  if (token != periodsym) {
+  if (token.type != periodsym) {
     error(1);
   }
 }
+
 void BLOCK() {
   CONST_DECL();
-  int numVars = VAR_DECL(); 
+  int numVars = VAR_DECL();
+  emit(INC, 0, (3 + numVars));
+  STATEMENT();
 }
-void CONST_DECL();
-int VAR_DECL();
-void STATEMENT();
-void CONDITION();
-void EXPRESSION();
-void TERM();
-void FACTOR();
+void CONST_DECL() {}
+int VAR_DECL() {}
+void STATEMENT() {}
+void CONDITION() {}
+void EXPRESSION() {}
+void TERM() {}
+void FACTOR() {}
 
 int main(int argc, char *argv[]) {
   char *inputArr = NULL;
