@@ -1033,7 +1033,7 @@ int main(int argc, char *argv[]) {
 
   // Output OP code to file (Trever Jones)
   char outputFilename[50];
-  snprintf(outputFilename, sizeof(outputFilename), "%s-Assembly-Output", inputFilename);
+  snprintf(outputFilename, sizeof(outputFilename), "%s-Assembly-Output.txt", inputFilename);
   output = fopen(outputFilename, "w");
 
   // Print OP codes (Jose Porta)
