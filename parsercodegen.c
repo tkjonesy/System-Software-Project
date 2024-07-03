@@ -19,7 +19,7 @@ Jose Porta
 
 // Instruction and Opr. enums (Jose Porta)
 enum Instruct { LIT = 1, OPR, LOD, STO, CAL, INC, JMP, JPC, SYS };
-enum Oprs { RTN = 0, ADD, SUB, MUL, DIV, EQL, NEQ, LSS, LEQ, GTR, GEQ };
+enum Oprs { RTN = 0, ADD, SUB, MUL, DIV, EQL, NEQ, LSS, LEQ, GTR, GEQ, ODD };
 
 // Token type enum (Jose Porta)
 typedef enum {
@@ -446,7 +446,7 @@ START OF PARSER
 */
 
 // Debug mode switch (prints extra details)
-int debug = 1;
+int debug = 0;
 // Symbol struct (Jose Porta)
 typedef struct Symbol {
   int kind;      // const = 1, var = 2, proc = 3
@@ -493,10 +493,12 @@ typedef enum {
   missingBecomesym,
   beginMissingEnd,
   ifMissingThen,
+  ifMissingFi,
   whileMissingDo,
   conditionMissingOper,
   unclosedParenth,
-  arithmeticError
+  arithmeticError,
+  missingVarAfterRead,
 } errorCode;
 
 // Error handling (Trever Jones)
@@ -537,6 +539,9 @@ void error(errorCode error) {
   case ifMissingThen:
     printf("Error: if must be followed by then\n");
     exit(1);
+  case ifMissingFi:
+    printf("Error: fi must follow then.\n");
+    exit(1);
   case whileMissingDo:
     printf("Error: while must be followed by do\n");
     exit(1);
@@ -549,6 +554,9 @@ void error(errorCode error) {
   case arithmeticError:
     printf("Error: arithmetic equations must contain operands, parentheses, "
            "numbers, or symbols\n");
+    exit(1);
+  case missingVarAfterRead:
+    printf("Error: read must be followed by a variable name.\n");
     exit(1);
   default:
     printf("Undefined error %d\n", error);
@@ -569,10 +577,11 @@ void emit(int OP, int L, int M) {
     cx++;
   }
 }
-
+// Function signatures
+void FACTOR();
+void TERM();
+void EXPRESSION();
 // Grammar functions (Trever Jones / Jose Porta)
-
-void EXPRESSION() {}
 
 void FACTOR() {
   if (curr_token.type == identsym) {
@@ -609,9 +618,221 @@ void FACTOR() {
     error(arithmeticError);
   }
 }
-void TERM() {}
-void CONDITION() {}
-void STATEMENT() {}
+
+void TERM() {
+  FACTOR();
+  while (curr_token.type == multsym || curr_token.type == slashsym) {
+    if (curr_token.type == multsym) {
+      getNextToken();
+      FACTOR();
+      emit(OPR, 0, MUL);
+    }
+    
+    else {
+      getNextToken();
+      FACTOR();
+      emit(OPR, 0, DIV);
+    }
+  }
+}
+
+void EXPRESSION() {
+  TERM();
+  
+  while (curr_token.type == plussym || curr_token.type == minussym) {
+    if (curr_token.type == plussym) {
+      getNextToken();
+      TERM();
+      emit(OPR, 0, ADD);
+    }
+    
+    else {
+      getNextToken();
+      TERM();
+      emit(OPR, 0, SUB);
+    }
+  }
+}
+
+void CONDITION() {
+  // ODD
+  if (curr_token.type == oddsym) {
+    getNextToken();
+    EXPRESSION();
+    emit(OPR, 0, ODD);
+  } else {
+    EXPRESSION();
+    switch (curr_token.type)
+    {
+    // EQUAL
+    case eqsym:
+      getNextToken();
+      EXPRESSION();
+      emit(OPR, 0, EQL);
+      break;
+    // NOT EQUAL
+    case neqsym:
+      getNextToken();
+      EXPRESSION();
+      emit(OPR, 0, NEQ);
+      break;
+    // LESS THAN
+    case lessym:
+      getNextToken();
+      EXPRESSION();
+      emit(OPR, 0, LSS);
+      break;
+    // LESS THAN OR EQ TO
+    case leqsym:
+      getNextToken();
+      EXPRESSION();
+      emit(OPR, 0, LEQ);
+      break;
+    // GREATER THAN
+    case gtrsym:
+      getNextToken();
+      EXPRESSION();
+      emit(OPR, 0, GTR);
+      break;
+    // GREATER THAN OR EQ TO
+    case geqsym:
+      getNextToken();
+      EXPRESSION();
+      emit(OPR, 0, GEQ);
+      break;
+    default:
+    // Invalid Comparison
+      error(conditionMissingOper);
+      break;
+    }
+  }
+}
+
+void STATEMENT() {
+  int sym_idx;
+  int jpc_idx;
+  switch (curr_token.type) {
+  // VARIABLE MODIFICATION
+  case identsym:
+    sym_idx = sym_tbl_srch(curr_token.lexeme);
+
+    // Undeclared variable
+    if (sym_idx == -1){
+      error(undefinedInden);
+    }
+    // Identifier is not a variable
+    if (symbol_table[sym_idx].kind != 2) {
+      error(ConstAltered);
+    }
+
+    getNextToken();
+
+    // variable identifier is not follow by becomes
+    if (curr_token.type != becomessym) {
+      error(missingBecomesym);
+    }
+    
+    getNextToken();
+    EXPRESSION();
+    emit(STO,0,symbol_table[sym_idx].addr);
+    break;
+  
+  // BEGIN
+  case beginsym:
+    do {
+      getNextToken();
+      STATEMENT();
+    } while (curr_token.type == semicolonsym);
+
+    if (curr_token.type != endsym) {
+      error(beginMissingEnd);
+    }
+    getNextToken();
+    break;
+  
+  // IF STATEMENT
+  case ifsym:
+    getNextToken();
+    CONDITION();
+    jpc_idx = cx;
+    // JPC with dummy location
+    emit(JPC, 0, 0);
+
+    // Missing "then" after "if"
+    if (curr_token.type != thensym) {
+      error(ifMissingThen);
+    }
+    getNextToken();
+    STATEMENT();
+
+    // Missing "fi" after "if"
+    if (curr_token.type != fisym) {
+      error(ifMissingFi);
+    }
+    
+    // Update JPC with actual jump location
+    instructionList[jpc_idx].M = cx;
+    getNextToken();
+    break;
+
+  // WHILE LOOP
+  case whilesym:
+    getNextToken();
+    int loop_idx = cx;
+    CONDITION();
+
+    if (curr_token.type != dosym) {
+      error(whileMissingDo);
+    }
+
+    getNextToken();
+    jpc_idx = cx;
+
+      // JPC with dummy location
+      emit(JPC,0,0);
+      STATEMENT();
+      emit(JMP, 0, loop_idx);
+      // Update JPC with actual jump location
+      instructionList[jpc_idx].M = cx;
+    break;
+
+  // READ INPUT
+  case readsym:
+    getNextToken();
+    // Missing variable after READ
+    if (curr_token.type != identsym) {
+      error(missingVarAfterRead);
+    }
+    sym_idx = sym_tbl_srch(curr_token.lexeme);
+
+    // Undefined variable
+    if (sym_idx == -1) {
+      error(undefinedInden);
+    }
+
+    // Identifier is not a variable
+    if (symbol_table[sym_idx].kind != 2) {
+      error(ConstAltered);
+    }
+    
+    getNextToken();
+    // Emit READ instruction
+    emit(SYS,0,2);
+    emit(STO, 0, symbol_table[sym_idx].addr);
+    break;
+  // WRITE OUTPUT
+  case writesym:
+    getNextToken();
+    EXPRESSION();
+
+    // Emit WRITE instruction
+    emit(SYS, 0, 1);
+    break;
+
+  default:
+    break;
+  }
+}
 
 int VAR_DECL() {
   // printf("%s\n", curr_token.lexeme);
@@ -703,13 +924,50 @@ void BLOCK() {
 }
 
 void PROGRAM() {
+  emit(JMP, 0, 3);
   getNextToken();
   BLOCK();
   if (curr_token.type != periodsym) {
     error(1);
   }
+  emit(SYS,0, 3);
 }
 
+void print_op(int op){
+  //LIT = 1, OPR, LOD, STO, CAL, INC, JMP, JPC, SYS };
+  switch (op)
+  {
+  case LIT:
+    printf("LIT");
+    break;
+  case OPR:
+    printf("OPR");
+    break;
+  case LOD:
+  printf("LOD");
+  break;
+  case STO:
+  printf("STO");
+  break;
+  case CAL:
+  printf("CAL");
+  break;
+  case INC:
+  printf("INC");
+  break;
+  case JMP:
+  printf("JMP");
+  break;
+  case JPC:
+  printf("JPC");
+  break;
+  case SYS:
+  printf("SYS");
+  break;
+  default:
+    break;
+  }
+}
 int main(int argc, char *argv[]) {
   char *inputArr = NULL;
 
@@ -768,9 +1026,16 @@ int main(int argc, char *argv[]) {
       printf("%d ", tokenList[i].type);
     }
   }
-  printf("\n");
+  printf("\n\n");
 
   PROGRAM();
-
+  printf("Line\tOP\tL\tM\n");
+  for (int i = 0; i < cx; i++){
+    Instructions inst = instructionList[i];
+    printf("%d\t",i);
+    print_op(inst.OP);
+    printf("\t%d\t%d\n",  inst.L, inst.M);
+  }
+  
   return 0;
 }
