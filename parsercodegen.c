@@ -971,6 +971,8 @@ int main(int argc, char *argv[]) {
   char *inputArr = NULL;
 
   FILE *file;
+  FILE *output;
+  const char *inputFilename = argv[1];
   file = fopen(argv[1], "rb");
   long fileSize = 0;
 
@@ -1029,15 +1031,35 @@ int main(int argc, char *argv[]) {
 
   PROGRAM();
 
+  // Output OP code to file (Trever Jones)
+  char outputFilename[50];
+  snprintf(outputFilename, sizeof(outputFilename), "%s-Assembly-Output", inputFilename);
+  output = fopen(outputFilename, "w");
+
   // Print OP codes (Jose Porta)
   printf("\nAssembly Code:\n\n");
   printf("Line\tOP\tL\tM\n");
   for (int i = 0; i < cx; i++){
+    // Push OP code to output file (Trever Jones)
+    if (i != 0) {
+      fprintf(output, "\n%d %d %d",
+        instructionList[i].OP,
+        instructionList[i].L,
+        instructionList[i].M);
+    }
+    else {
+      fprintf(output, "%d %d %d",
+        instructionList[i].OP,
+        instructionList[i].L,
+        instructionList[i].M);
+    }
+
     Instructions inst = instructionList[i];
     printf("%d\t",i);
     print_op(inst.OP);
     printf("\t%d\t%d\n",  inst.L, inst.M);
   }
+  fclose(output);
 
   // Print Symbol table (Trever Jones)
   printf("\nSymbol Table:\n\n");
