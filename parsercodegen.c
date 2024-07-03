@@ -509,7 +509,7 @@ void error(errorCode error) {
     exit(1);
   case declareMissingIden:
     printf("Error: const, var, and read keywords must be followed by "
-           "identifier\n");
+           "identifier: %s\n", curr_token.lexeme);
     exit(1);
   case symbolTaken:
     printf("Error: symbol name has already been declared %s\n", curr_token.lexeme);
@@ -843,7 +843,6 @@ int VAR_DECL() {
       num_vars++;
       getNextToken();
       if (curr_token.type != identsym) {
-        printf("%s", curr_token.lexeme);
         error(declareMissingIden);
       }
 
