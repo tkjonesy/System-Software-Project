@@ -572,11 +572,46 @@ void emit(int OP, int L, int M) {
 
 // Grammar functions (Trever Jones / Jose Porta)
 
-void STATEMENT() {}
-void CONDITION() {}
 void EXPRESSION() {}
+
+void FACTOR() {
+  if (curr_token.type == identsym) {
+    int symIdx = sym_tbl_srch(curr_token.lexeme);
+    
+    if (symIdx == -1) {
+      error(undefinedInden);
+    }
+
+    // Identifier is a const (Trever Jones)
+    if (symbol_table[symIdx].kind == 1) {
+      emit(LIT, 0, symbol_table[symIdx].val);
+    }
+
+    // Identifier is a var (Trever Jones)
+    else {
+      emit(LOD, 0, symbol_table[symIdx].addr);
+    }
+    getNextToken();
+  }
+  else if (curr_token.type == numbersym) {
+    emit(LIT, 0, atoi(curr_token.lexeme));
+    getNextToken();
+  }
+  else if (curr_token.type == lparentsym) {
+    getNextToken();
+    EXPRESSION();
+    if (curr_token.type != rparentsym) {
+      error(unclosedParenth);
+    }
+    getNextToken();
+  }
+  else {
+    error(arithmeticError);
+  }
+}
 void TERM() {}
-void FACTOR() {}
+void CONDITION() {}
+void STATEMENT() {}
 
 int VAR_DECL() {
   // printf("%s\n", curr_token.lexeme);
@@ -670,7 +705,6 @@ void BLOCK() {
 void PROGRAM() {
   getNextToken();
   BLOCK();
-  // getNextToken();
   if (curr_token.type != periodsym) {
     error(1);
   }
