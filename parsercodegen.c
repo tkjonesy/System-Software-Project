@@ -522,7 +522,7 @@ void error(errorCode error) {
     exit(1);
   case declareMissingSemicolon:
     printf("Error: constant and variable declarations must be followed by a "
-           "semicolon\n");
+           "semicolon: %s\n", curr_token.lexeme);
     exit(1);
   case undefinedInden:
     printf("Error: undeclared identifier\n");
@@ -1026,15 +1026,34 @@ int main(int argc, char *argv[]) {
       printf("%d ", tokenList[i].type);
     }
   }
-  printf("\n\n");
+  printf("\n");
 
   PROGRAM();
+
+  // Print OP codes (Jose Porta)
+  printf("\nAssembly Code:\n\n");
   printf("Line\tOP\tL\tM\n");
   for (int i = 0; i < cx; i++){
     Instructions inst = instructionList[i];
     printf("%d\t",i);
     print_op(inst.OP);
     printf("\t%d\t%d\n",  inst.L, inst.M);
+  }
+
+  // Print Symbol table (Trever Jones)
+  printf("\nSymbol Table:\n\n");
+  printf("%-5s | %-11s | %-5s | %-5s | %-7s | %-5s\n", "Kind", "Name", "Value", "Level", "Address", "Mark");
+  printf("-------------------------------------------------------------\n");
+  for (int i = 0; i < num_symbols; i++) {
+    // Mark all with 1, execution is over (Trever Jones)
+    symbol_table[i].mark = 1;
+    printf("%-5d | %-11s | %-5d | %-5d | %-7d | %-5d\n", 
+            symbol_table[i].kind, 
+            symbol_table[i].name, 
+            symbol_table[i].val, 
+            symbol_table[i].level, 
+            symbol_table[i].addr, 
+            symbol_table[i].mark);
   }
   
   return 0;
