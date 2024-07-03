@@ -476,7 +476,7 @@ int sym_tbl_srch(char string[]) {
 void getNextToken() {
   curr_token = tokenList[parserPos++];
   if (debug == 1) {
-    printf("%s\n", curr_token.lexeme);
+    printf("Current Token: %s\n", curr_token.lexeme);
   }
 }
 
@@ -510,7 +510,7 @@ void error(errorCode error) {
            "identifier\n");
     exit(1);
   case symbolTaken:
-    printf("Error: symbol name has already been declared\n");
+    printf("Error: symbol name has already been declared %s\n", curr_token.lexeme);
     exit(1);
   case constMissingEqual:
     printf("Error: constants must be assigned with =\n");
