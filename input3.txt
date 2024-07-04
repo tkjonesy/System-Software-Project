@@ -7,5 +7,5 @@ y:= x;
     while i < d do
         y := x * y;
         i := i + 1;
-x 
+z := d * y;
 end.

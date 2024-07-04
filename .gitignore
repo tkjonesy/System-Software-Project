@@ -3,4 +3,5 @@
 vmog.c
 *.docx
 \class_stuff\
-Assembly-Output-input.txt
+Assembly-Output*.txt
+vm2.c
