@@ -446,7 +446,7 @@ START OF PARSER
 */
 
 // Debug mode switch (prints extra details)
-int debug = 0;
+int debug = 1;
 // Symbol struct (Jose Porta)
 typedef struct Symbol {
   int kind;      // const = 1, var = 2, proc = 3
@@ -587,6 +587,8 @@ void EXPRESSION();
 // Grammar functions (Trever Jones / Jose Porta)
 
 void FACTOR() {
+  char *ptr;
+  long val;
   if (curr_token.type == identsym) {
     int symIdx = sym_tbl_srch(curr_token.lexeme);
 
@@ -738,11 +740,17 @@ void STATEMENT() {
 
   // BEGIN
   case beginsym:
-    do {
+    getNextToken();
+    STATEMENT();
+    // do {
+    //   getNextToken();
+    //   STATEMENT();
+    // } while (curr_token.type == semicolonsym);
+    
+    while (curr_token.type == semicolonsym) {
       getNextToken();
       STATEMENT();
-    } while (curr_token.type == semicolonsym);
-
+    }
     if (curr_token.type != endsym) {
       error(beginMissingEnd);
     }
@@ -770,14 +778,14 @@ void STATEMENT() {
     }
 
     // Update JPC with actual jump location
-    instructionList[jpc_idx].M = cx;
+    instructionList[jpc_idx].M = cx*3;
     getNextToken();
     break;
 
   // WHILE LOOP
   case whilesym:
     getNextToken();
-    int loop_idx = cx;
+    int loop_idx = cx*3;
     CONDITION();
 
     if (curr_token.type != dosym) {
@@ -792,7 +800,7 @@ void STATEMENT() {
     STATEMENT();
     emit(JMP, 0, loop_idx);
     // Update JPC with actual jump location
-    instructionList[jpc_idx].M = cx;
+    instructionList[jpc_idx].M = cx*3;
     break;
 
   // READ INPUT

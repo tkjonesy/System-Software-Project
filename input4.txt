@@ -1,0 +1,13 @@
+const a = 2, b = 2;
+var x, y, z;
+begin
+read x;
+y := x + a;
+z := y * b;
+while z > 0 do
+  z := z - 1;
+if z = 0 then
+  write z
+  fi;
+write (z + a) * (b / a)
+end.

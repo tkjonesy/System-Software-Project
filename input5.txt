@@ -1,0 +1,13 @@
+const d = 5;
+var x, y,z;
+begin
+y := 1;
+z := 0;
+read x;
+if x > 5 then
+write y
+fi;
+    if x < 5 then
+    write z
+    fi;
+end.
