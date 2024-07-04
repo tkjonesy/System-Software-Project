@@ -1,0 +1,11 @@
+const d = 5;
+var x, y, z, i;
+begin
+i := 1;
+x := 2;
+y:= x;
+    while i < d do
+        y := x * y;
+        i := i + 1;
+x 
+end.
