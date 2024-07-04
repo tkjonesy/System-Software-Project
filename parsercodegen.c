@@ -509,10 +509,12 @@ void error(errorCode error) {
     exit(1);
   case declareMissingIden:
     printf("Error: const, var, and read keywords must be followed by "
-           "identifier: %s\n", curr_token.lexeme);
+           "identifier: %s\n",
+           curr_token.lexeme);
     exit(1);
   case symbolTaken:
-    printf("Error: symbol name has already been declared %s\n", curr_token.lexeme);
+    printf("Error: symbol name has already been declared %s\n",
+           curr_token.lexeme);
     exit(1);
   case constMissingEqual:
     printf("Error: constants must be assigned with =\n");
@@ -522,7 +524,8 @@ void error(errorCode error) {
     exit(1);
   case declareMissingSemicolon:
     printf("Error: constant and variable declarations must be followed by a "
-           "semicolon: %s\n", curr_token.lexeme);
+           "semicolon: %s\n",
+           curr_token.lexeme);
     exit(1);
   case undefinedInden:
     printf("Error: undeclared identifier\n");
@@ -586,7 +589,7 @@ void EXPRESSION();
 void FACTOR() {
   if (curr_token.type == identsym) {
     int symIdx = sym_tbl_srch(curr_token.lexeme);
-    
+
     if (symIdx == -1) {
       error(undefinedInden);
     }
@@ -601,20 +604,17 @@ void FACTOR() {
       emit(LOD, 0, symbol_table[symIdx].addr);
     }
     getNextToken();
-  }
-  else if (curr_token.type == numbersym) {
+  } else if (curr_token.type == numbersym) {
     emit(LIT, 0, atoi(curr_token.lexeme));
     getNextToken();
-  }
-  else if (curr_token.type == lparentsym) {
+  } else if (curr_token.type == lparentsym) {
     getNextToken();
     EXPRESSION();
     if (curr_token.type != rparentsym) {
       error(unclosedParenth);
     }
     getNextToken();
-  }
-  else {
+  } else {
     error(arithmeticError);
   }
 }
@@ -627,7 +627,7 @@ void TERM() {
       FACTOR();
       emit(OPR, 0, MUL);
     }
-    
+
     else {
       getNextToken();
       FACTOR();
@@ -638,14 +638,14 @@ void TERM() {
 
 void EXPRESSION() {
   TERM();
-  
+
   while (curr_token.type == plussym || curr_token.type == minussym) {
     if (curr_token.type == plussym) {
       getNextToken();
       TERM();
       emit(OPR, 0, ADD);
     }
-    
+
     else {
       getNextToken();
       TERM();
@@ -662,8 +662,7 @@ void CONDITION() {
     emit(OPR, 0, ODD);
   } else {
     EXPRESSION();
-    switch (curr_token.type)
-    {
+    switch (curr_token.type) {
     // EQUAL
     case eqsym:
       getNextToken();
@@ -701,7 +700,7 @@ void CONDITION() {
       emit(OPR, 0, GEQ);
       break;
     default:
-    // Invalid Comparison
+      // Invalid Comparison
       error(conditionMissingOper);
       break;
     }
@@ -717,7 +716,7 @@ void STATEMENT() {
     sym_idx = sym_tbl_srch(curr_token.lexeme);
 
     // Undeclared variable
-    if (sym_idx == -1){
+    if (sym_idx == -1) {
       error(undefinedInden);
     }
     // Identifier is not a variable
@@ -731,12 +730,12 @@ void STATEMENT() {
     if (curr_token.type != becomessym) {
       error(missingBecomesym);
     }
-    
+
     getNextToken();
     EXPRESSION();
-    emit(STO,0,symbol_table[sym_idx].addr);
+    emit(STO, 0, symbol_table[sym_idx].addr);
     break;
-  
+
   // BEGIN
   case beginsym:
     do {
@@ -749,7 +748,7 @@ void STATEMENT() {
     }
     getNextToken();
     break;
-  
+
   // IF STATEMENT
   case ifsym:
     getNextToken();
@@ -769,7 +768,7 @@ void STATEMENT() {
     if (curr_token.type != fisym) {
       error(ifMissingFi);
     }
-    
+
     // Update JPC with actual jump location
     instructionList[jpc_idx].M = cx;
     getNextToken();
@@ -788,12 +787,12 @@ void STATEMENT() {
     getNextToken();
     jpc_idx = cx;
 
-      // JPC with dummy location
-      emit(JPC,0,0);
-      STATEMENT();
-      emit(JMP, 0, loop_idx);
-      // Update JPC with actual jump location
-      instructionList[jpc_idx].M = cx;
+    // JPC with dummy location
+    emit(JPC, 0, 0);
+    STATEMENT();
+    emit(JMP, 0, loop_idx);
+    // Update JPC with actual jump location
+    instructionList[jpc_idx].M = cx;
     break;
 
   // READ INPUT
@@ -814,10 +813,10 @@ void STATEMENT() {
     if (symbol_table[sym_idx].kind != 2) {
       error(ConstAltered);
     }
-    
+
     getNextToken();
     // Emit READ instruction
-    emit(SYS,0,2);
+    emit(SYS, 0, 2);
     emit(STO, 0, symbol_table[sym_idx].addr);
     break;
   // WRITE OUTPUT
@@ -929,13 +928,12 @@ void PROGRAM() {
   if (curr_token.type != periodsym) {
     error(1);
   }
-  emit(SYS,0, 3);
+  emit(SYS, 0, 3);
 }
 
-void print_op(int op){
-  //LIT = 1, OPR, LOD, STO, CAL, INC, JMP, JPC, SYS };
-  switch (op)
-  {
+void print_op(int op) {
+  // LIT = 1, OPR, LOD, STO, CAL, INC, JMP, JPC, SYS };
+  switch (op) {
   case LIT:
     printf("LIT");
     break;
@@ -943,26 +941,26 @@ void print_op(int op){
     printf("OPR");
     break;
   case LOD:
-  printf("LOD");
-  break;
+    printf("LOD");
+    break;
   case STO:
-  printf("STO");
-  break;
+    printf("STO");
+    break;
   case CAL:
-  printf("CAL");
-  break;
+    printf("CAL");
+    break;
   case INC:
-  printf("INC");
-  break;
+    printf("INC");
+    break;
   case JMP:
-  printf("JMP");
-  break;
+    printf("JMP");
+    break;
   case JPC:
-  printf("JPC");
-  break;
+    printf("JPC");
+    break;
   case SYS:
-  printf("SYS");
-  break;
+    printf("SYS");
+    break;
   default:
     break;
   }
@@ -1033,49 +1031,42 @@ int main(int argc, char *argv[]) {
 
   // Output OP code to file (Trever Jones)
   char outputFilename[50];
-  snprintf(outputFilename, sizeof(outputFilename), "%s-Assembly-Output.txt", inputFilename);
+  snprintf(outputFilename, sizeof(outputFilename), "Assembly-Output-%s",
+           inputFilename);
   output = fopen(outputFilename, "w");
 
   // Print OP codes (Jose Porta)
   printf("\nAssembly Code:\n\n");
   printf("Line\tOP\tL\tM\n");
-  for (int i = 0; i < cx; i++){
+  for (int i = 0; i < cx; i++) {
     // Push OP code to output file (Trever Jones)
     if (i != 0) {
-      fprintf(output, "\n%d %d %d",
-        instructionList[i].OP,
-        instructionList[i].L,
-        instructionList[i].M);
-    }
-    else {
-      fprintf(output, "%d %d %d",
-        instructionList[i].OP,
-        instructionList[i].L,
-        instructionList[i].M);
+      fprintf(output, "\n%d %d %d", instructionList[i].OP, instructionList[i].L,
+              instructionList[i].M);
+    } else {
+      fprintf(output, "%d %d %d", instructionList[i].OP, instructionList[i].L,
+              instructionList[i].M);
     }
 
     Instructions inst = instructionList[i];
-    printf("%d\t",i);
+    printf("%d\t", i);
     print_op(inst.OP);
-    printf("\t%d\t%d\n",  inst.L, inst.M);
+    printf("\t%d\t%d\n", inst.L, inst.M);
   }
   fclose(output);
 
   // Print Symbol table (Trever Jones)
   printf("\nSymbol Table:\n\n");
-  printf("%-5s | %-11s | %-5s | %-5s | %-7s | %-5s\n", "Kind", "Name", "Value", "Level", "Address", "Mark");
+  printf("%-5s | %-11s | %-5s | %-5s | %-7s | %-5s\n", "Kind", "Name", "Value",
+         "Level", "Address", "Mark");
   printf("-------------------------------------------------------------\n");
   for (int i = 0; i < num_symbols; i++) {
     // Mark all with 1, execution is over (Trever Jones)
     symbol_table[i].mark = 1;
-    printf("%-5d | %-11s | %-5d | %-5d | %-7d | %-5d\n", 
-            symbol_table[i].kind, 
-            symbol_table[i].name, 
-            symbol_table[i].val, 
-            symbol_table[i].level, 
-            symbol_table[i].addr, 
-            symbol_table[i].mark);
+    printf("%-5d | %-11s | %-5d | %-5d | %-7d | %-5d\n", symbol_table[i].kind,
+           symbol_table[i].name, symbol_table[i].val, symbol_table[i].level,
+           symbol_table[i].addr, symbol_table[i].mark);
   }
-  
+
   return 0;
 }
