@@ -446,7 +446,7 @@ START OF PARSER
 */
 
 // Debug mode switch (prints extra details)
-int debug = 0;
+int debug = 1;
 // Symbol struct (Jose Porta)
 typedef struct Symbol {
   int kind;      // const = 1, var = 2, proc = 3

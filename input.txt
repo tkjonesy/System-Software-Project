@@ -1,3 +1,8 @@
-const aspdrfygthd = 45124;
-var x, y, w;
-x := y + w.
+var call, procedure, else;
+begin
+call := 0;
+else := 0;
+if odd call = else then
+write call
+fi;
+end.
