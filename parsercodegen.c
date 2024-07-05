@@ -446,7 +446,7 @@ START OF PARSER
 */
 
 // Debug mode switch (prints extra details)
-int debug = 1;
+int debug = 0;
 // Symbol struct (Jose Porta)
 typedef struct Symbol {
   int kind;      // const = 1, var = 2, proc = 3
@@ -580,6 +580,14 @@ void emit(int OP, int L, int M) {
     cx++;
   }
 }
+
+// Function for marking every symbol to 1 after execution (Trever Jones)
+void markAllSymb () {
+  for (int i = 0; i < num_symbols; i++) {
+      symbol_table[i].mark = 1;
+    }
+}
+
 // Function signatures
 void FACTOR();
 void TERM();
@@ -937,6 +945,8 @@ void PROGRAM() {
     error(1);
   }
   emit(SYS, 0, 3);
+  // Mark all with 1, execution is over (Trever Jones)
+  markAllSymb();
 }
 
 void print_op(int op) {
@@ -1069,8 +1079,7 @@ int main(int argc, char *argv[]) {
          "Level", "Address", "Mark");
   printf("-------------------------------------------------------------\n");
   for (int i = 0; i < num_symbols; i++) {
-    // Mark all with 1, execution is over (Trever Jones)
-    symbol_table[i].mark = 1;
+    // symbol_table[i].mark = 1;
     printf("%-5d | %-11s | %-5d | %-5d | %-7d | %-5d\n", symbol_table[i].kind,
            symbol_table[i].name, symbol_table[i].val, symbol_table[i].level,
            symbol_table[i].addr, symbol_table[i].mark);
