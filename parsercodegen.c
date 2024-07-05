@@ -446,7 +446,7 @@ START OF PARSER
 */
 
 // Debug mode switch (prints extra details)
-int debug = 1;
+int debug = 0;
 // Symbol struct (Jose Porta)
 typedef struct Symbol {
   int kind;      // const = 1, var = 2, proc = 3
@@ -595,9 +595,6 @@ void EXPRESSION();
 // Grammar functions (Trever Jones / Jose Porta)
 
 void FACTOR() {
-  char *ptr;
-  long val;
-  printf("factor%c\n", curr_token.lexeme);
   if (curr_token.type == identsym) {
     int symIdx = sym_tbl_srch(curr_token.lexeme);
 
@@ -631,41 +628,39 @@ void FACTOR() {
 }
 
 void TERM() {
+  Token operand;
   FACTOR();
+
   while (curr_token.type == multsym || curr_token.type == slashsym) {
-    if (curr_token.type == multsym) {
-      getNextToken();
-      FACTOR();
+    operand = curr_token;
+    getNextToken();
+    FACTOR();
+
+    if (operand.type == multsym) {
       emit(OPR, 0, MUL);
     }
-
-    else if (curr_token.type == slashsym) {
-      getNextToken();
-      FACTOR();
+    
+    else {
       emit(OPR, 0, DIV);
-    } else {
-      error(arithmeticError);
-    }
+    } 
   }
 }
 
 void EXPRESSION() {
+  Token operand;
   TERM();
 
   while (curr_token.type == plussym || curr_token.type == minussym) {
+    operand = curr_token;
+    getNextToken();
+    TERM();
 
-    if (curr_token.type == plussym) {
-      getNextToken();
-      TERM();
+    if (operand.type == plussym) {
       emit(OPR, 0, ADD);
     }
-
-    else if (curr_token.type == minussym) {
-      getNextToken();
-      TERM();
+    
+    else {
       emit(OPR, 0, SUB);
-    } else {
-      error(arithmeticError);
     }
   }
 }
@@ -675,8 +670,8 @@ void CONDITION() {
   if (curr_token.type == oddsym) {
     getNextToken();
     EXPRESSION();
-    printf("Expression function completed\n");
-    if (curr_token.type != dosym || curr_token.type != thensym) {
+    
+    if (curr_token.type != dosym && curr_token.type != thensym) {
       error(arithmeticError);
     }
 

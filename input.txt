@@ -2,7 +2,7 @@ var call, procedure, else;
 begin
 call := 0;
 else := 0;
-if odd call > else then
+if odd call + else then
 write call
 fi;
-end.
+end
