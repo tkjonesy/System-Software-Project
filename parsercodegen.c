@@ -378,14 +378,14 @@ void parser(long f_sz, char input_arr[]) {
     case oddsym:
     case constsym:
     case varsym:
-    case procsym:
-    case callsym:
+    // case procsym:
+    // case callsym:
     case beginsym:
     case endsym:
     case ifsym:
     case fisym:
     case thensym:
-    case elsesym:
+    // case elsesym:
     case whilesym:
     case dosym:
     case readsym:
@@ -582,10 +582,10 @@ void emit(int OP, int L, int M) {
 }
 
 // Function for marking every symbol to 1 after execution (Trever Jones)
-void markAllSymb () {
+void markAllSymb() {
   for (int i = 0; i < num_symbols; i++) {
-      symbol_table[i].mark = 1;
-    }
+    symbol_table[i].mark = 1;
+  }
 }
 
 // Function signatures
@@ -597,6 +597,7 @@ void EXPRESSION();
 void FACTOR() {
   char *ptr;
   long val;
+  printf("factor%c\n", curr_token.lexeme);
   if (curr_token.type == identsym) {
     int symIdx = sym_tbl_srch(curr_token.lexeme);
 
@@ -638,10 +639,12 @@ void TERM() {
       emit(OPR, 0, MUL);
     }
 
-    else {
+    else if (curr_token.type == slashsym) {
       getNextToken();
       FACTOR();
       emit(OPR, 0, DIV);
+    } else {
+      error(arithmeticError);
     }
   }
 }
@@ -650,16 +653,19 @@ void EXPRESSION() {
   TERM();
 
   while (curr_token.type == plussym || curr_token.type == minussym) {
+
     if (curr_token.type == plussym) {
       getNextToken();
       TERM();
       emit(OPR, 0, ADD);
     }
 
-    else {
+    else if (curr_token.type == minussym) {
       getNextToken();
       TERM();
       emit(OPR, 0, SUB);
+    } else {
+      error(arithmeticError);
     }
   }
 }
@@ -669,6 +675,11 @@ void CONDITION() {
   if (curr_token.type == oddsym) {
     getNextToken();
     EXPRESSION();
+    printf("Expression function completed\n");
+    if (curr_token.type != dosym || curr_token.type != thensym) {
+      error(arithmeticError);
+    }
+
     emit(OPR, 0, ODD);
   } else {
     EXPRESSION();
@@ -754,7 +765,7 @@ void STATEMENT() {
     //   getNextToken();
     //   STATEMENT();
     // } while (curr_token.type == semicolonsym);
-    
+
     while (curr_token.type == semicolonsym) {
       getNextToken();
       STATEMENT();
@@ -786,14 +797,14 @@ void STATEMENT() {
     }
 
     // Update JPC with actual jump location
-    instructionList[jpc_idx].M = cx*3;
+    instructionList[jpc_idx].M = cx * 3;
     getNextToken();
     break;
 
   // WHILE LOOP
   case whilesym:
     getNextToken();
-    int loop_idx = cx*3;
+    int loop_idx = cx * 3;
     CONDITION();
 
     if (curr_token.type != dosym) {
@@ -808,7 +819,7 @@ void STATEMENT() {
     STATEMENT();
     emit(JMP, 0, loop_idx);
     // Update JPC with actual jump location
-    instructionList[jpc_idx].M = cx*3;
+    instructionList[jpc_idx].M = cx * 3;
     break;
 
   // READ INPUT
