@@ -756,10 +756,6 @@ void STATEMENT() {
   case beginsym:
     getNextToken();
     STATEMENT();
-    // do {
-    //   getNextToken();
-    //   STATEMENT();
-    // } while (curr_token.type == semicolonsym);
 
     while (curr_token.type == semicolonsym) {
       getNextToken();
@@ -1085,7 +1081,6 @@ int main(int argc, char *argv[]) {
          "Level", "Address", "Mark");
   printf("-------------------------------------------------------------\n");
   for (int i = 0; i < num_symbols; i++) {
-    // symbol_table[i].mark = 1;
     printf("%-5d | %-11s | %-5d | %-5d | %-7d | %-5d\n", symbol_table[i].kind,
            symbol_table[i].name, symbol_table[i].val, symbol_table[i].level,
            symbol_table[i].addr, symbol_table[i].mark);
