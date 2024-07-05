@@ -63,7 +63,7 @@ Ensure input file is in the same directory then run the .exe passing the input f
 
 ## Example
 
-```bash
+```
 # Example command and expected output
 ./parsercodegen input4.txt
 
