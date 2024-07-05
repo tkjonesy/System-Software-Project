@@ -65,79 +65,146 @@ Ensure input file is in the same directory then run the .exe passing the input f
 
 ```bash
 # Example command and expected output
-./parsercodegen input.txt
-Output: Result of processing input.txt
+./parsercodegen input4.txt
+
+# Output: Result of processing input4.txt
 Source Program:
-.xvar w, x, 5;
-read w;
-beginy
-555555
-   x:= 4;
-   /* testing */
-   if w > x then
-        w:= w + 1
-   else
-   /*test */
-        w := x;
-   fi
-   /*
-   ><<><>>
-   =
-end
-write w.
+const a = 2, b = 2;
+var x, y, z;
+begin
+read x;
+y := x + a;
+z := y * b;
+while z > 0 do
+  z := z - 1;
+if z = 0 then
+  write z
+  fi;
+write (z + a) * (b / a)
+end.
 
 Lexeme Table:
 
 Lexeme Token   Type
-.              19
-xvar           2
-w              2
+const          28
+a              2
+=              9
+2              3
 ,              17
+b              2
+=              9
+2              3
+;              18
+var            29
 x              2
 ,              17
-5              3
+y              2
+,              17
+z              2
 ;              18
+begin          21
 read           32
-w              2
-;              18
-beginy         2
-Error: number '555555' execeeds max length (5)
 x              2
+;              18
+y              2
 :=             20
-4              3
+x              2
++              4
+a              2
+;              18
+z              2
+:=             20
+y              2
+*              6
+b              2
+;              18
+while          25
+z              2
+>              13
+0              3
+do             26
+z              2
+:=             20
+z              2
+-              5
+1              3
 ;              18
 if             23
-w              2
->              13
-x              2
-then           24
-w              2
-:=             20
-w              2
-+              4
-1              3
-else           33
-w              2
-:=             20
-x              2
-;              18
-fi             8
-Error: Comment opened and not properly closed
-/              7
-*              6
->              13
-<              11
-<>             10
-<>             10
->              13
+z              2
 =              9
-end            22
+0              3
+then           24
 write          31
-w              2
+z              2
+fi             8
+;              18
+write          31
+(              15
+z              2
++              4
+a              2
+)              16
+*              6
+(              15
+b              2
+/              7
+a              2
+)              16
+end            22
 .              19
 
 Token List:
-19 2 xvar 2 w 17 2 x 17 3 5 18 32 2 w 18 2 beginy 2 x 20 3 4 18 23 2 w 13 2 x 24 2 w 20 2 w 4 3 1 33 2 w 20 2 x 18 8 7 6 13 11 10 10 13 9 22 31 2 w 19 
+28 2 a 9 3 2 17 2 b 9 3 2 18 29 2 x 17 2 y 17 2 z 18 21 32 2 x 18 2 y 20 2 x 4 2 a 18 2 z 20 2 y 6 2 b 18 25 2 z 13 3 0 26 2 z 20 2 z 5 3 1 18 23 2 z 9 3 0 24 31 2 z 8 18 31 15 2 z 4 2 a 16 6 15 2 b 7 2 a 16 22 19
+
+Assembly Code:
+
+Line    OP      L       M
+0       JMP     0       3
+1       INC     0       6
+2       SYS     0       2
+3       STO     0       3
+4       LOD     0       3
+5       LIT     0       2
+6       OPR     0       1
+7       STO     0       4
+8       LOD     0       4
+9       LIT     0       2
+10      OPR     0       3
+11      STO     0       5
+12      LOD     0       5
+13      LIT     0       0
+14      OPR     0       9
+15      JPC     0       63
+16      LOD     0       5
+17      LIT     0       1
+18      OPR     0       2
+19      STO     0       5
+20      JMP     0       36
+21      LOD     0       5
+22      LIT     0       0
+23      OPR     0       5
+24      JPC     0       81
+25      LOD     0       5
+26      SYS     0       1
+27      LOD     0       5
+28      LIT     0       2
+29      OPR     0       1
+30      LIT     0       2
+31      LIT     0       2
+32      OPR     0       4
+33      OPR     0       3
+34      SYS     0       1
+35      SYS     0       3
+
+Symbol Table:
+
+Kind  | Name        | Value | Level | Address | Mark
+-------------------------------------------------------------
+1     | a           | 2     | 0     | 0       | 1
+1     | b           | 2     | 0     | 0       | 1
+2     | x           | 0     | 0     | 3       | 1
+2     | y           | 0     | 0     | 4       | 1
+2     | z           | 0     | 0     | 5       | 1
 ```
 
 ## Team Members
