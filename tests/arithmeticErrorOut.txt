@@ -1,0 +1,46 @@
+Source Program:
+var x, y, z,w;
+begin
+w := 0;
+x := 0;
+if z + + y then
+write x
+fi;
+end
+
+Lexeme Table:
+
+Lexeme Token   Type
+var            29
+x              2
+,              17
+y              2
+,              17
+z              2
+,              17
+w              2
+;              18
+begin          21
+w              2
+:=             20
+0              3
+;              18
+x              2
+:=             20
+0              3
+;              18
+if             23
+z              2
++              4
++              4
+y              2
+then           24
+write          31
+x              2
+fi             8
+;              18
+end            22
+
+Token List:
+29 2 x 17 2 y 17 2 z 17 2 w 18 21 2 w 20 3 0 18 2 x 20 3 0 18 23 2 z 4 4 2 y 24 31 2 x 8 18 22 
+Error: arithmetic equations must contain operands, parentheses, numbers, or symbols

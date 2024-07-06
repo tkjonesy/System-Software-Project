@@ -1,0 +1,6 @@
+const d = 5;
+var x, y;
+begin
+    if x > y 
+    x := 2;
+end.

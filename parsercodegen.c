@@ -129,6 +129,10 @@ int is_sym(char c) {
     return 35;
 
   default:
+    if (!isalpha(c) && !isdigit(c) && !isspace(c)) {
+      printf("Error: Invalid symbol: '%c'\n", c);
+      exit(1);
+    }
     return 0;
   }
 }
@@ -267,7 +271,7 @@ void parser(long f_sz, char input_arr[]) {
       // Handle invalid symbol (Trever Jones)
       else {
         state = 0;
-        printf("Error: Invalid symbol: '%s'\n", currChar);
+        printf("Error: Invalid symbol: '%c'\n", currChar);
         exit(1);
         reset_lexeme();
       }
@@ -414,13 +418,15 @@ void parser(long f_sz, char input_arr[]) {
         break;
 
       } else {
-        printf("Error: Invalid symbol: '%s'\n", currChar);
+        printf("Error: Invalid symbol: '%c'\n", currChar);
         exit(1);
         reset_lexeme();
         state = 0;
       }
 
     default:
+      printf("Error: Invalid symbol:\n");
+      exit(1);
       break;
     }
   }
@@ -498,7 +504,6 @@ typedef enum {
   conditionMissingOper,
   unclosedParenth,
   arithmeticError,
-  missingVarAfterRead,
 } errorCode;
 
 // Error handling (Trever Jones)
@@ -508,7 +513,7 @@ void error(errorCode error) {
     printf("Error: program must end with period\n");
     exit(1);
   case declareMissingIden:
-    printf("Error: const, var, and read keywords must be followed by "
+    printf("Error: const, var, and read keywords must be followed by an "
            "identifier: %s\n",
            curr_token.lexeme);
     exit(1);
@@ -523,12 +528,10 @@ void error(errorCode error) {
     printf("Error: constants must be assigned an integer value\n");
     exit(1);
   case declareMissingSemicolon:
-    printf("Error: constant and variable declarations must be followed by a "
-           "semicolon: %s\n",
-           curr_token.lexeme);
+    printf("Error: constant and variable declarations must be followed by a semicolon");
     exit(1);
   case undefinedInden:
-    printf("Error: undeclared identifier\n");
+    printf("Error: undeclared identifier: %s\n", curr_token.lexeme);
     exit(1);
   case ConstAltered:
     printf("Error: only variable values may be altered\n");
@@ -557,9 +560,6 @@ void error(errorCode error) {
   case arithmeticError:
     printf("Error: arithmetic equations must contain operands, parentheses, "
            "numbers, or symbols\n");
-    exit(1);
-  case missingVarAfterRead:
-    printf("Error: read must be followed by a variable name.\n");
     exit(1);
   default:
     printf("Undefined error %d\n", error);
@@ -639,10 +639,10 @@ void TERM() {
     if (operand.type == multsym) {
       emit(OPR, 0, MUL);
     }
-    
+
     else {
       emit(OPR, 0, DIV);
-    } 
+    }
   }
 }
 
@@ -658,7 +658,7 @@ void EXPRESSION() {
     if (operand.type == plussym) {
       emit(OPR, 0, ADD);
     }
-    
+
     else {
       emit(OPR, 0, SUB);
     }
@@ -670,7 +670,7 @@ void CONDITION() {
   if (curr_token.type == oddsym) {
     getNextToken();
     EXPRESSION();
-    
+
     if (curr_token.type != dosym && curr_token.type != thensym) {
       error(arithmeticError);
     }
@@ -818,7 +818,7 @@ void STATEMENT() {
     getNextToken();
     // Missing variable after READ
     if (curr_token.type != identsym) {
-      error(missingVarAfterRead);
+      error(declareMissingIden);
     }
     sym_idx = sym_tbl_srch(curr_token.lexeme);
 
@@ -1009,7 +1009,7 @@ int main(int argc, char *argv[]) {
     fseek(file, 0, SEEK_SET);
 
     // Dynamically allocate input array (Trever Jones)
-    inputArr = (char *)malloc(fileSize);
+    inputArr = (char *)malloc(fileSize + 1);
     if (inputArr == NULL) {
       printf("Memory allocation failed\n");
       fclose(file);

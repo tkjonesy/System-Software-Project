@@ -1,0 +1,7 @@
+const d = 5;
+var x, y;
+begin
+    while x > y
+    x := 2;
+    fi
+end.

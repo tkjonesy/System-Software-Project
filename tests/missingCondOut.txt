@@ -1,0 +1,38 @@
+Source Program:
+const d = 5;
+var x, y;
+begin
+    if x y then
+    x := 2;
+    fi
+end.
+
+Lexeme Table:
+
+Lexeme Token   Type
+const          28
+d              2
+=              9
+5              3
+;              18
+var            29
+x              2
+,              17
+y              2
+;              18
+begin          21
+if             23
+x              2
+y              2
+then           24
+x              2
+:=             20
+2              3
+;              18
+fi             8
+end            22
+.              19
+
+Token List:
+28 2 d 9 3 5 18 29 2 x 17 2 y 18 21 23 2 x 2 y 24 2 x 20 3 2 18 8 22 19 
+Error: condition must contain comparison operator

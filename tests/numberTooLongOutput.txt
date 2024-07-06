@@ -1,0 +1,9 @@
+Source Program:
+cosnt = 123234
+
+Lexeme Table:
+
+Lexeme Token   Type
+cosnt          2
+=              9
+Error: number '123234' execeeds max length (5)

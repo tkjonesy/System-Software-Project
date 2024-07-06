@@ -1,0 +1,38 @@
+Source Program:
+const d = 5;
+var x, y;
+begin
+    while x > y
+    x := 2;
+    fi
+end.
+
+Lexeme Table:
+
+Lexeme Token   Type
+const          28
+d              2
+=              9
+5              3
+;              18
+var            29
+x              2
+,              17
+y              2
+;              18
+begin          21
+while          25
+x              2
+>              13
+y              2
+x              2
+:=             20
+2              3
+;              18
+fi             8
+end            22
+.              19
+
+Token List:
+28 2 d 9 3 5 18 29 2 x 17 2 y 18 21 25 2 x 13 2 y 2 x 20 3 2 18 8 22 19 
+Error: while must be followed by do

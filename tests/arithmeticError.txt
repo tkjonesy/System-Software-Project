@@ -1,0 +1,8 @@
+var x, y, z,w;
+begin
+w := 0;
+x := 0;
+if z + + y then
+write x
+fi;
+end

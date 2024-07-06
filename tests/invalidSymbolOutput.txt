@@ -1,0 +1,7 @@
+Source Program:
+$
+
+Lexeme Table:
+
+Lexeme Token   Type
+Error: Invalid symbol: '$'

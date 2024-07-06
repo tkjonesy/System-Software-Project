@@ -1,0 +1,8 @@
+Source Program:
+var sjdhfbcvfhse
+
+Lexeme Table:
+
+Lexeme Token   Type
+var            29
+Error: identifier 'sjdhfbcvfhse' execeeds max length (11)

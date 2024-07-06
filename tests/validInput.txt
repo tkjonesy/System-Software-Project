@@ -5,9 +5,11 @@ read x;
 y := x + a;
 z := y * b;
 while z > 0 do
+  begin
   z := z - 1;
-if z = 0 then
-  write z
-  fi;
+  if z < 10 then
+    write z
+  fi
+  end;
 write (z + a) * (b / a)
 end.

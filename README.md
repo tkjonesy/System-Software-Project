@@ -65,9 +65,9 @@ Ensure input file is in the same directory then run the .exe passing the input f
 
 ```
 # Example command and expected output
-./parsercodegen input4.txt
+./parsercodegen validInput.txt
 
-# Output: Result of processing input4.txt
+# Output: Result of processing validInput.txt
 Source Program:
 const a = 2, b = 2;
 var x, y, z;

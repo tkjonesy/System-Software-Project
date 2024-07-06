@@ -1,0 +1,7 @@
+const 5;
+var x, y;
+begin
+    if x > y then
+    y:= y / 2
+fi;
+end.

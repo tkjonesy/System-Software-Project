@@ -1,0 +1,7 @@
+Source Program:
+/* this is a comment
+
+Lexeme Table:
+
+Lexeme Token   Type
+Error: Comment opened and not properly closed
