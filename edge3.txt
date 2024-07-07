@@ -1,0 +1,13 @@
+const d = 10;
+var x, y, z;
+begin
+y := 900;
+x := 91;
+z := 0;
+if x > 100 then write z fi;
+while z < d do
+begin
+write z;
+z := z + 1;
+end;
+end.

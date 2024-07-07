@@ -434,24 +434,10 @@ void parser(long f_sz, char input_arr[]) {
 /* END OF SCANNER */
 
 /*
-
-
-
-
-
-
-
 START OF PARSER
-
-
-
-
-
-
-
 */
 
-// Debug mode switch (prints extra details)
+// Debug mode switch (prints extra details) (Jose Porta)
 int debug = 0;
 // Symbol struct (Jose Porta)
 typedef struct Symbol {
@@ -467,6 +453,7 @@ typedef struct Symbol {
 Symbol symbol_table[MAX_SYMBOL_TABLE_SIZE];
 int num_symbols = 0;
 
+// SYM table search (Jose Porta)
 int sym_tbl_srch(char string[]) {
   for (int i = 0; i < num_symbols; i++) {
     // If matching symbol exists return it's index (i)
@@ -588,16 +575,18 @@ void markAllSymb() {
   }
 }
 
-// Function signatures
+// Function signatures (Jose Porta)
 void FACTOR();
 void TERM();
 void EXPRESSION();
 // Grammar functions (Trever Jones / Jose Porta)
 
+// Factor parser and code generation (Trever Jones)
 void FACTOR() {
   if (curr_token.type == identsym) {
     int symIdx = sym_tbl_srch(curr_token.lexeme);
 
+    // Verify identity is defined
     if (symIdx == -1) {
       error(undefinedInden);
     }
@@ -613,6 +602,7 @@ void FACTOR() {
     }
     getNextToken();
   } else if (curr_token.type == numbersym) {
+    // Emit LIT with lexeme as int
     emit(LIT, 0, atoi(curr_token.lexeme));
     getNextToken();
   } else if (curr_token.type == lparentsym) {
@@ -627,10 +617,13 @@ void FACTOR() {
   }
 }
 
+// Term parser and code generation (Trever Jones)
 void TERM() {
   Token operand;
+  // Required factor in term
   FACTOR();
 
+  // Optional factors in term
   while (curr_token.type == multsym || curr_token.type == slashsym) {
     operand = curr_token;
     getNextToken();
@@ -646,10 +639,13 @@ void TERM() {
   }
 }
 
+// Expression parser and code generation (Trever Jones)
 void EXPRESSION() {
   Token operand;
+  // Required term in expression
   TERM();
 
+  // Optional terms
   while (curr_token.type == plussym || curr_token.type == minussym) {
     operand = curr_token;
     getNextToken();
@@ -665,64 +661,69 @@ void EXPRESSION() {
   }
 }
 
+// CONDITIONS parsing & code gen (Jose Porta)
 void CONDITION() {
   // ODD
   if (curr_token.type == oddsym) {
     getNextToken();
+    // Parse expression after "odd"
     EXPRESSION();
 
+    // Verify there's no extra/incorrect tokens in "odd" conditional (Jose Porta)
     if (curr_token.type != dosym && curr_token.type != thensym) {
       error(arithmeticError);
     }
 
     emit(OPR, 0, ODD);
   } else {
+
     EXPRESSION();
     switch (curr_token.type) {
-    // EQUAL
+    // EQUAL (Jose Porta)
     case eqsym:
       getNextToken();
       EXPRESSION();
       emit(OPR, 0, EQL);
       break;
-    // NOT EQUAL
+    // NOT EQUAL (Jose Porta)
     case neqsym:
       getNextToken();
       EXPRESSION();
       emit(OPR, 0, NEQ);
       break;
-    // LESS THAN
+    // LESS THAN (Jose Porta)
     case lessym:
       getNextToken();
       EXPRESSION();
       emit(OPR, 0, LSS);
       break;
-    // LESS THAN OR EQ TO
+    // LESS THAN OR EQ TO (Jose Porta)
     case leqsym:
       getNextToken();
       EXPRESSION();
       emit(OPR, 0, LEQ);
       break;
-    // GREATER THAN
+    // GREATER THAN (Jose Porta)
     case gtrsym:
       getNextToken();
       EXPRESSION();
       emit(OPR, 0, GTR);
       break;
-    // GREATER THAN OR EQ TO
+    // GREATER THAN OR EQ TO (Jose Porta)
     case geqsym:
       getNextToken();
       EXPRESSION();
       emit(OPR, 0, GEQ);
       break;
+    // Invalid Comparison (Jose Porta)
     default:
-      // Invalid Comparison
       error(conditionMissingOper);
       break;
     }
   }
 }
 
+// STATEMENT parsing and codegen (Jose Porta)
 void STATEMENT() {
   int sym_idx;
   int jpc_idx;
@@ -752,26 +753,34 @@ void STATEMENT() {
     emit(STO, 0, symbol_table[sym_idx].addr);
     break;
 
-  // BEGIN
+  // BEGIN statement declaration (Jose Porta)
   case beginsym:
     getNextToken();
+    // Mandatory statement after "begin"
     STATEMENT();
 
+    // Optional statements in "begin"
     while (curr_token.type == semicolonsym) {
       getNextToken();
       STATEMENT();
     }
+
+    // "begin" must be followed by "end"
     if (curr_token.type != endsym) {
       error(beginMissingEnd);
     }
+
     getNextToken();
     break;
 
-  // IF STATEMENT
+  // IF STATEMENT (Jose Porta)
   case ifsym:
     getNextToken();
+    // Get condition after "if"
     CONDITION();
+    // Position of conditional jump in code array
     jpc_idx = cx;
+
     // JPC with dummy location
     emit(JPC, 0, 0);
 
@@ -779,6 +788,7 @@ void STATEMENT() {
     if (curr_token.type != thensym) {
       error(ifMissingThen);
     }
+
     getNextToken();
     STATEMENT();
 
@@ -787,42 +797,52 @@ void STATEMENT() {
       error(ifMissingFi);
     }
 
-    // Update JPC with actual jump location
+    // Update JPC with location after conditional statement
+    // (location is mult. by 3 to account for PC in VM)
     instructionList[jpc_idx].M = cx * 3;
     getNextToken();
     break;
 
-  // WHILE LOOP
+  // WHILE LOOP (Jose Porta)
   case whilesym:
     getNextToken();
+    // Location of loop start in code array
+    // (location is mult. by 3 to account for PC in VM)
     int loop_idx = cx * 3;
     CONDITION();
 
+    // Check for "do" following "while"
     if (curr_token.type != dosym) {
       error(whileMissingDo);
     }
 
     getNextToken();
+    // Position of conditional jump in code array
     jpc_idx = cx;
 
     // JPC with dummy location
     emit(JPC, 0, 0);
     STATEMENT();
+
+    // JMP to loop start
     emit(JMP, 0, loop_idx);
-    // Update JPC with actual jump location
+
+    // Update JPC with location after while statement
+    // (location is mult. by 3 to account for PC in VM)
     instructionList[jpc_idx].M = cx * 3;
     break;
 
-  // READ INPUT
+  // READ INPUT (Jose Porta)
   case readsym:
     getNextToken();
     // Missing variable after READ
     if (curr_token.type != identsym) {
       error(declareMissingIden);
     }
+
     sym_idx = sym_tbl_srch(curr_token.lexeme);
 
-    // Undefined variable
+    // Undefined identifier
     if (sym_idx == -1) {
       error(undefinedInden);
     }
@@ -833,11 +853,14 @@ void STATEMENT() {
     }
 
     getNextToken();
+
     // Emit READ instruction
     emit(SYS, 0, 2);
+    // Store input value in variable provided
     emit(STO, 0, symbol_table[sym_idx].addr);
     break;
-  // WRITE OUTPUT
+
+  // WRITE OUTPUT (Jose Porta)
   case writesym:
     getNextToken();
     EXPRESSION();
@@ -846,23 +869,26 @@ void STATEMENT() {
     emit(SYS, 0, 1);
     break;
 
+  // Empty statement case
   default:
     break;
   }
 }
 
+// VARIABLE DECLARATION (Trever Jones)
 int VAR_DECL() {
-  // printf("%s\n", curr_token.lexeme);
   int num_vars = 0;
+  // Check if var (optional) is declared
   if (curr_token.type == varsym) {
-
+    // Variable must be followed by at least 1 identifier if declared
     do {
+      // Update var count
       num_vars++;
       getNextToken();
       if (curr_token.type != identsym) {
         error(declareMissingIden);
       }
-
+      // Check if identifier is taken
       int ident_idx = sym_tbl_srch(curr_token.lexeme);
       if (ident_idx != -1) {
         error(symbolTaken);
@@ -879,6 +905,8 @@ int VAR_DECL() {
       getNextToken();
 
     } while (curr_token.type == commasym);
+
+    // Declaration statement must end with ';'
     if (curr_token.type != semicolonsym) {
       error(declareMissingSemicolon);
     }
@@ -888,15 +916,19 @@ int VAR_DECL() {
   return num_vars;
 }
 
+// Constant declaration parser and code generation (Trever Jones)
 void CONST_DECL() {
   if (curr_token.type == constsym) {
 
     do {
       getNextToken();
 
+      // Const must be followed by identifier
       if (curr_token.type != identsym) {
         error(declareMissingIden);
       }
+
+      // Check if symbol has already been declared
       if (sym_tbl_srch(curr_token.lexeme) != -1) {
         error(symbolTaken);
       }
@@ -906,11 +938,14 @@ void CONST_DECL() {
       strcpy(iden, curr_token.lexeme);
 
       getNextToken();
+
+      // Verify const is declared with '='
       if (curr_token.type != eqsym) {
         error(constMissingEqual);
       }
 
       getNextToken();
+      // Verify const is set to numerical value
       if (curr_token.type != numbersym) {
         error(constMissingInt);
       }
@@ -932,6 +967,7 @@ void CONST_DECL() {
   }
 }
 
+// Block parser and code generation (Trever Jones)
 void BLOCK() {
   CONST_DECL();
   int numVars = VAR_DECL();
@@ -939,6 +975,7 @@ void BLOCK() {
   STATEMENT();
 }
 
+// Program parser and code generation (Trever Jones)
 void PROGRAM() {
   emit(JMP, 0, 3);
   getNextToken();
@@ -951,6 +988,7 @@ void PROGRAM() {
   markAllSymb();
 }
 
+// Print semantic repr. of OP code (Jose Porta)
 void print_op(int op) {
   // LIT = 1, OPR, LOD, STO, CAL, INC, JMP, JPC, SYS };
   switch (op) {
@@ -985,6 +1023,7 @@ void print_op(int op) {
     break;
   }
 }
+
 int main(int argc, char *argv[]) {
   char *inputArr = NULL;
 
@@ -1047,6 +1086,7 @@ int main(int argc, char *argv[]) {
   }
   printf("\n");
 
+  // Run code generation (Trever Jones)
   PROGRAM();
 
   // Output OP code to file (Trever Jones)
@@ -1068,6 +1108,7 @@ int main(int argc, char *argv[]) {
               instructionList[i].M);
     }
 
+    // Print code to screen (Jose Porta)
     Instructions inst = instructionList[i];
     printf("%d\t", i);
     print_op(inst.OP);
