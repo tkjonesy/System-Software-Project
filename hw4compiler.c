@@ -491,6 +491,7 @@ typedef enum {
   conditionMissingOper,
   unclosedParenth,
   arithmeticError,
+  callMissingIden
 } errorCode;
 
 // Error handling (Trever Jones)
@@ -500,8 +501,7 @@ void error(errorCode error) {
     printf("Error: program must end with period\n");
     exit(1);
   case declareMissingIden:
-    printf("Error: const, var, and read keywords must be followed by an "
-           "identifier: %s\n",
+    printf("Error: const, var, and read keywords must be followed by an identifier: %s\n",
            curr_token.lexeme);
     exit(1);
   case symbolTaken:
@@ -545,8 +545,10 @@ void error(errorCode error) {
     printf("Error: right parenthesis must follow left parenthesis\n");
     exit(1);
   case arithmeticError:
-    printf("Error: arithmetic equations must contain operands, parentheses, "
-           "numbers, or symbols\n");
+    printf("Error: arithmetic equations must contain operands, parentheses, numbers, or symbols\n");
+    exit(1);
+  case callMissingIden:
+    printf("Error: call keyword must be followed by an identifier: '%s'\n", curr_token.lexeme);
     exit(1);
   default:
     printf("Undefined error %d\n", error);
@@ -867,6 +869,15 @@ void STATEMENT() {
 
     // Emit WRITE instruction
     emit(SYS, 0, 1);
+    break;
+  
+  // CALLSYM (Trever Jones)
+  case callsym:
+    getNextToken();
+    if (curr_token.type != identsym) {
+      error(callMissingIden);
+    }
+    getNextToken();
     break;
 
   // Empty statement case

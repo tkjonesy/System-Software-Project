@@ -1,2 +1,2 @@
-call
-procedure
+var x, y;
+call x.
