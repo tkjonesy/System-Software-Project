@@ -1,4 +1,4 @@
-# Homework 3: Tiny PL/0 Compiler
+# Homework 4: Tiny PL/0 Compiler
 
 ## Description
 
