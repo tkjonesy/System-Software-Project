@@ -59,9 +59,9 @@ typedef enum {
 } token_type;
 
 // Reserved words (Jose Porta)
-char *reserved[] = {"odd", "const", "var",   "begin", "end",  "if",
+char *reserved[] = {"odd", "const", "var", "procedure", "call", "begin", "end",  "if",
                     "fi",  "then",  "while", "do",    "read", "write"};
-int res_enums[] = {oddsym, constsym, varsym,   beginsym, endsym,  ifsym,
+int res_enums[] = {oddsym, constsym, varsym, procsym, callsym, beginsym, endsym,  ifsym,
                    fisym,  thensym,  whilesym, dosym,    readsym, writesym};
 
 // Token struct (Jose Porta)
@@ -382,8 +382,8 @@ void parser(long f_sz, char input_arr[]) {
     case oddsym:
     case constsym:
     case varsym:
-    // case procsym:
-    // case callsym:
+    case procsym:
+    case callsym:
     case beginsym:
     case endsym:
     case ifsym:
