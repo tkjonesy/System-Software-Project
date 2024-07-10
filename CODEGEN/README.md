@@ -4,31 +4,31 @@
 
 This project takes the tokens produced by the scanner and passed to the parser to check syntax, populate a symbol table, and output an ISA to pass to the virtual machine created in HW1.
 
-EBNF of PL/0:<br>
+EBNF of  tiny PL/0:
 
-program ::= block "." .<br>
-block ::= const-declaration var-declaration procedure-declaration statement.<br>
-constdeclaration ::= ["const" ident "=" number {"," ident "=" number} ";"].<br>
-var-declaration ::= [ "var "ident {"," ident} “;"].<br>
-procedure-declaration ::= { "procedure" ident ";" block ";" }<br>
-statement ::= [ ident ":=" expression<br>
-| "call" ident<br>
-| "begin" statement { ";" statement } "end"<br>
-| "if" condition "then" statement "fi"<br>
-| "while" condition "do" statement<br>
-| "read" ident<br>
-| "write" expression<br>
-| empty ] .<br>
-condition ::= "odd" expression<br>
-| expression rel-op expression.<br>
-rel-op ::= "="|“< >"|"<"|"<="|">"|">=“.<br>
-expression ::= term { ("+"|"-") term}.<br>
-term ::= factor {("*"|"/") factor}.<br>
+program ::= block "." . <br>
+block ::= const-declaration  var-declaration  statement.	<br>
+constdeclaration ::= [ “const” ident "=" number {"," ident "=" number} “;"].	<br>
+var-declaration  ::= [ "var" ident {"," ident} “;"].<br>
+statement   ::= [ ident ":=" expression<br>
+	      	| "begin" statement { ";" statement } "end" <br>
+	      	| "if" condition "then" statement "fi"<br>
+		| "while" condition "do" statement<br>
+| "read" ident <br>
+		| "write"  expression <br>
+	      	| empty ] .  <br>
+condition ::= "odd" expression <br>
+	  	| expression  rel-op  expression. <br>
+rel-op ::= "="|“<>"|"<"|"<="|">"|">=“.<br>
+expression ::=  term { ("+"|"-") term}.<br>
+term ::= factor {("*"|"/") factor}. <br>
 factor ::= ident | number | "(" expression ")“.<br>
 number ::= digit {digit}.<br>
 ident ::= letter {letter | digit}.<br>
 digit ;;= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9“.<br>
-letter ::= "a" | "b" | … | "y" | "z" | "A" | "B" | ... | "Y" | "Z".<br>
+letter ::= "a" | "b" | … | "y" | "z" | "A" | "B" | ... |"Y" | "Z".<br>
+
+ 
 Based on Wirth’s definition for EBNF we have the following rule:<br>
 [ ] means an optional item.<br>
 { } means repeat 0 or more times.<br>
@@ -56,16 +56,16 @@ Navigate to the folder: <br>
 `cd ...\System Software Project\`
 
 Compile the code:<br>
-`gcc -o hw4compiler hw4compiler.c`
+`gcc -o parsercodegen parsercodegen.c`
 
 Ensure input file is in the same directory then run the .exe passing the input file name:<br>
-`./hw4compiler <inputFileName>`
+`./parsercodegen <inputFileName>`
 
 ## Example
 
 ```
 # Example command and expected output
-./hw4compiler validInput.txt
+./parsercodegen validInput.txt
 
 # Output: Result of processing validInput.txt
 Source Program:
