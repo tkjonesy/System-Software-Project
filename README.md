@@ -12,15 +12,15 @@ constdeclaration ::= ["const" ident "=" number {"," ident "=" number} ";"].<br>
 var-declaration ::= [ "var "ident {"," ident} “;"].<br>
 procedure-declaration ::= { "procedure" ident ";" block ";" }<br>
 statement ::= [ ident ":=" expression<br>
-| "call" ident<br>
-| "begin" statement { ";" statement } "end"<br>
-| "if" condition "then" statement "fi"<br>
-| "while" condition "do" statement<br>
-| "read" ident<br>
-| "write" expression<br>
-| empty ] .<br>
+  | "call" ident<br>
+  | "begin" statement { ";" statement } "end"<br>
+  | "if" condition "then" statement "fi"<br>
+  | "while" condition "do" statement<br>
+  | "read" ident<br>
+  | "write" expression<br>
+  | empty ] .<br>
 condition ::= "odd" expression<br>
-| expression rel-op expression.<br>
+  | expression rel-op expression.<br>
 rel-op ::= "="|“< >"|"<"|"<="|">"|">=“.<br>
 expression ::= term { ("+"|"-") term}.<br>
 term ::= factor {("*"|"/") factor}.<br>
