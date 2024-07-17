@@ -494,7 +494,8 @@ typedef enum {
   conditionMissingOper,
   unclosedParenth,
   arithmeticError,
-  callMissingIden
+  callMissingIden,
+  callOnVar
 } errorCode;
 
 // Error handling (Trever Jones)
@@ -552,6 +553,9 @@ void error(errorCode error) {
     exit(1);
   case callMissingIden:
     printf("Error: call keyword must be followed by an identifier: '%s'\n", curr_token.lexeme);
+    exit(1);
+  case callOnVar:
+  printf("Error: call cannot call variables or constants: '%s'\n", curr_token.lexeme);
     exit(1);
   default:
     printf("Undefined error %d\n", error);
@@ -879,6 +883,19 @@ void STATEMENT() {
     getNextToken();
     if (curr_token.type != identsym) {
       error(callMissingIden);
+    }
+
+    int i = sym_tbl_srch(curr_token.lexeme);
+    if (i == -1) {
+      error(undefinedInden);
+    }
+
+    if (symbol_table[i].kind == 3) {
+      emit(CAL, symbol_table[i].level, symbol_table[i].addr);
+    }
+    
+    else {
+      error(callOnVar);
     }
     getNextToken();
     break;
