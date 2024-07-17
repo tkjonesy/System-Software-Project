@@ -76,6 +76,9 @@ int num_tokens = 0;
 // Index for the parser (Trever Jones)
 int parserPos = 0;
 
+// Track global lexicographical level (Trever Jones)
+int globalLevel = -1;
+
 // Instruction set architecture (Trever Jones)
 int cx = 0;
 typedef struct Instructions {
@@ -455,7 +458,7 @@ int num_symbols = 0;
 
 // SYM table search (Jose Porta)
 int sym_tbl_srch(char string[]) {
-  for (int i = 0; i < num_symbols; i++) {
+  for (int i = num_symbols - 1; i >= 0 ; i--) {
     // If matching symbol exists return it's index (i)
     if (strcmp(string, symbol_table[i].name) == 0) {
       return i;
@@ -980,15 +983,17 @@ void CONST_DECL() {
 
 // Block parser and code generation (Trever Jones)
 void BLOCK() {
+  emit(JMP, 0, 3);
+  globalLevel++;
   CONST_DECL();
   int numVars = VAR_DECL();
   emit(INC, 0, (3 + numVars));
   STATEMENT();
+  globalLevel--;
 }
 
 // Program parser and code generation (Trever Jones)
 void PROGRAM() {
-  emit(JMP, 0, 3);
   getNextToken();
   BLOCK();
   if (curr_token.type != periodsym) {

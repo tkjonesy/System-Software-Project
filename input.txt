@@ -1,2 +1,2 @@
-var x, y;
-call x.
+var x, y, z;
+call z.
