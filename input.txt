@@ -1,2 +1,1 @@
-var x, y, z;
-call z.
+var x, y, z;.

@@ -929,7 +929,7 @@ int VAR_DECL() {
       symbol_table[num_symbols].kind = 2;
       strcpy(symbol_table[num_symbols].name, curr_token.lexeme);
       symbol_table[num_symbols].val = 0;
-      symbol_table[num_symbols].level = 0;
+      symbol_table[num_symbols].level = globalLevel;
       symbol_table[num_symbols].addr = num_vars + 2;
       symbol_table[num_symbols].mark = 0;
       num_symbols++;
@@ -1000,7 +1000,7 @@ void CONST_DECL() {
 
 // Block parser and code generation (Trever Jones)
 void BLOCK() {
-  emit(JMP, 0, 3);
+  emit(JMP, 0, 666);
   globalLevel++;
   CONST_DECL();
   int numVars = VAR_DECL();
