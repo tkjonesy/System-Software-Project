@@ -59,10 +59,12 @@ typedef enum {
 } token_type;
 
 // Reserved words (Jose Porta)
-char *reserved[] = {"odd", "const", "var", "procedure", "call", "begin", "end",  "if",
-                    "fi",  "then",  "while", "do",    "read", "write"};
-int res_enums[] = {oddsym, constsym, varsym, procsym, callsym, beginsym, endsym,  ifsym,
-                   fisym,  thensym,  whilesym, dosym,    readsym, writesym};
+char *reserved[] = {"odd",   "const", "var",  "procedure", "call",
+                    "begin", "end",   "if",   "fi",        "then",
+                    "while", "do",    "read", "write"};
+int res_enums[] = {oddsym,   constsym, varsym,  procsym, callsym,
+                   beginsym, endsym,   ifsym,   fisym,   thensym,
+                   whilesym, dosym,    readsym, writesym};
 
 // Token struct (Jose Porta)
 typedef struct Token {
@@ -392,7 +394,6 @@ void parser(long f_sz, char input_arr[]) {
     case ifsym:
     case fisym:
     case thensym:
-    // case elsesym:
     case whilesym:
     case dosym:
     case readsym:
@@ -458,7 +459,7 @@ int num_symbols = 0;
 
 // SYM table search (Jose Porta)
 int sym_tbl_srch(char string[]) {
-  for (int i = num_symbols - 1; i >= 0 ; i--) {
+  for (int i = num_symbols - 1; i >= 0; i--) {
     // If matching symbol exists return it's index (i)
     if (strcmp(string, symbol_table[i].name) == 0) {
       return i;
@@ -505,8 +506,10 @@ void error(errorCode error) {
     printf("Error: program must end with period\n");
     exit(1);
   case declareMissingIden:
-    printf("Error: const, var, and read keywords must be followed by an identifier: %s\n",
-           curr_token.lexeme);
+    printf(
+        "Error: const, var, procedure and read keywords must be followed by an "
+        "identifier: %s\n",
+        curr_token.lexeme);
     exit(1);
   case symbolTaken:
     printf("Error: symbol name has already been declared %s\n",
@@ -519,7 +522,8 @@ void error(errorCode error) {
     printf("Error: constants must be assigned an integer value\n");
     exit(1);
   case declareMissingSemicolon:
-    printf("Error: constant and variable declarations must be followed by a semicolon");
+    printf("Error: constant and variable declarations must be followed by a "
+           "semicolon");
     exit(1);
   case undefinedInden:
     printf("Error: undeclared identifier: %s\n", curr_token.lexeme);
@@ -549,13 +553,16 @@ void error(errorCode error) {
     printf("Error: right parenthesis must follow left parenthesis\n");
     exit(1);
   case arithmeticError:
-    printf("Error: arithmetic equations must contain operands, parentheses, numbers, or symbols\n");
+    printf("Error: arithmetic equations must contain operands, parentheses, "
+           "numbers, or symbols\n");
     exit(1);
   case callMissingIden:
-    printf("Error: call keyword must be followed by an identifier: '%s'\n", curr_token.lexeme);
+    printf("Error: call keyword must be followed by an identifier: '%s'\n",
+           curr_token.lexeme);
     exit(1);
   case callOnVar:
-  printf("Error: call cannot call variables or constants: '%s'\n", curr_token.lexeme);
+    printf("Error: call cannot call variables or constants: '%s'\n",
+           curr_token.lexeme);
     exit(1);
   default:
     printf("Undefined error %d\n", error);
@@ -678,7 +685,8 @@ void CONDITION() {
     // Parse expression after "odd"
     EXPRESSION();
 
-    // Verify there's no extra/incorrect tokens in "odd" conditional (Jose Porta)
+    // Verify there's no extra/incorrect tokens in "odd" conditional (Jose
+    // Porta)
     if (curr_token.type != dosym && curr_token.type != thensym) {
       error(arithmeticError);
     }
@@ -877,7 +885,7 @@ void STATEMENT() {
     // Emit WRITE instruction
     emit(SYS, 0, 1);
     break;
-  
+
   // CALLSYM (Trever Jones)
   case callsym:
     getNextToken();
@@ -893,7 +901,7 @@ void STATEMENT() {
     if (symbol_table[i].kind == 3) {
       emit(CAL, symbol_table[i].level, symbol_table[i].addr);
     }
-    
+
     else {
       error(callOnVar);
     }
@@ -903,6 +911,18 @@ void STATEMENT() {
   // Empty statement case
   default:
     break;
+  }
+}
+
+// Procedure Generation (Jose Porta)
+void PROC_DECL() {
+  if (curr_token.type == procsym) {
+    do {
+      getNextToken();
+      if (curr_token.type != identsym) {
+        error(declareMissingIden);
+      }
+    } while (curr_token.type == semicolonsym);
   }
 }
 
