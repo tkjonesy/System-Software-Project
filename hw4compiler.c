@@ -597,6 +597,9 @@ void markAllSymb() {
 void FACTOR();
 void TERM();
 void EXPRESSION();
+void BLOCK();
+int VAR_DECL();
+void CONST_DECL();
 // Grammar functions (Trever Jones / Jose Porta)
 
 // Factor parser and code generation (Trever Jones)
@@ -933,8 +936,16 @@ void PROC_DECL() {
     if (curr_token.type != semicolonsym) {
       error(declareMissingSemicolon);
     }
+    printf("enter block\n");
+    getNextToken();
+    BLOCK();
+    printf("exit block\n");
+    if (curr_token.type != semicolonsym) {
+      error(declareMissingSemicolon);
+    }
     getNextToken();
   }
+  // getNextToken();
 }
 
 // VARIABLE DECLARATION (Trever Jones)
