@@ -1,7 +1,20 @@
 const b = 5;
 var x,y;
-procedure pro1;
-y := 10;
+    procedure pro1;
+        var w;
+        begin
+            
+            w := 10;
+            y := w*2;
+        end;
+    procedure pro2;
+            var p;
+            begin
+                
+                p := 10;
+                y := p*2;
+            end;
 begin
+call pro1;
 x := y*2;
 end.

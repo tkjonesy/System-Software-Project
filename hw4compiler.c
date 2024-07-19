@@ -597,7 +597,7 @@ void markAllSymb() {
 void FACTOR();
 void TERM();
 void EXPRESSION();
-void BLOCK();
+int BLOCK();
 int VAR_DECL();
 void CONST_DECL();
 // Grammar functions (Trever Jones / Jose Porta)
@@ -931,6 +931,15 @@ void PROC_DECL() {
     if (ident_idx != -1) {
       error(symbolTaken);
     }
+    // Add procedure identifier to symbol table
+    int tx = num_symbols;
+    symbol_table[tx].kind = 3;
+    strcpy(symbol_table[tx].name, curr_token.lexeme);
+    symbol_table[tx].val = 0;
+    symbol_table[tx].mark = 0;
+    symbol_table[tx].level = globalLevel;
+
+    num_symbols++;
 
     getNextToken();
     if (curr_token.type != semicolonsym) {
@@ -938,11 +947,15 @@ void PROC_DECL() {
     }
     printf("enter block\n");
     getNextToken();
-    BLOCK();
+    /* NOTE: Fix scoping issues e.g. procedures can access variables 1 level
+     * higher but cant store values there*/
+    int bx = BLOCK();
     printf("exit block\n");
+    symbol_table[tx].addr = bx;
     if (curr_token.type != semicolonsym) {
       error(declareMissingSemicolon);
     }
+    emit(OPR, 0, 0);
     getNextToken();
   }
   // getNextToken();
@@ -1041,21 +1054,26 @@ void CONST_DECL() {
 }
 
 // Block parser and code generation (Trever Jones)
-void BLOCK() {
+int BLOCK() {
+  int jmp_loc = cx;
+  int bx;
   emit(JMP, 0, 666);
   globalLevel++;
   CONST_DECL();
   int numVars = VAR_DECL();
   emit(INC, 0, (3 + numVars));
   PROC_DECL();
+  bx = cx * 3;
+  instructionList[jmp_loc].M = bx;
   STATEMENT();
   globalLevel--;
+  return bx;
 }
 
 // Program parser and code generation (Trever Jones)
 void PROGRAM() {
   getNextToken();
-  BLOCK();
+  int bx = BLOCK();
   if (curr_token.type != periodsym) {
     error(1);
   }
