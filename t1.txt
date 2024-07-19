@@ -1,0 +1,7 @@
+const b = 5;
+var x,y;
+procedure pro1;
+begin
+y := b*2;
+x := y *10
+end.

@@ -442,7 +442,7 @@ START OF PARSER
 */
 
 // Debug mode switch (prints extra details) (Jose Porta)
-int debug = 0;
+int debug = 1;
 // Symbol struct (Jose Porta)
 typedef struct Symbol {
   int kind;      // const = 1, var = 2, proc = 3
@@ -473,7 +473,8 @@ int sym_tbl_srch(char string[]) {
 void getNextToken() {
   curr_token = tokenList[parserPos++];
   if (debug == 1) {
-    printf("Current Token: %s\n", curr_token.lexeme);
+    printf("Current Token Lexeme: %s, Type: %d\n", curr_token.lexeme,
+           curr_token.type);
   }
 }
 
@@ -522,7 +523,8 @@ void error(errorCode error) {
     printf("Error: constants must be assigned an integer value\n");
     exit(1);
   case declareMissingSemicolon:
-    printf("Error: constant and variable declarations must be followed by a "
+    printf("Error: constant variable, and procedure declarations must be "
+           "followed by a "
            "semicolon");
     exit(1);
   case undefinedInden:
@@ -916,13 +918,22 @@ void STATEMENT() {
 
 // Procedure Generation (Jose Porta)
 void PROC_DECL() {
-  if (curr_token.type == procsym) {
-    do {
-      getNextToken();
-      if (curr_token.type != identsym) {
-        error(declareMissingIden);
-      }
-    } while (curr_token.type == semicolonsym);
+  while (curr_token.type == procsym) {
+    getNextToken();
+    if (curr_token.type != identsym) {
+      error(declareMissingIden);
+    }
+
+    int ident_idx = sym_tbl_srch(curr_token.lexeme);
+    if (ident_idx != -1) {
+      error(symbolTaken);
+    }
+
+    getNextToken();
+    if (curr_token.type != semicolonsym) {
+      error(declareMissingSemicolon);
+    }
+    getNextToken();
   }
 }
 
@@ -1025,6 +1036,7 @@ void BLOCK() {
   CONST_DECL();
   int numVars = VAR_DECL();
   emit(INC, 0, (3 + numVars));
+  PROC_DECL();
   STATEMENT();
   globalLevel--;
 }
