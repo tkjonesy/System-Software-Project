@@ -1,0 +1,20 @@
+const b = 5;
+var x,y;
+    procedure pro1;
+        var w;
+            procedure pro2;
+                var p; 
+                begin
+                    
+                    p := 10;
+                    w := p*2;
+                end;
+        begin
+            call pro2;
+            y := 2*w - 10;
+        end;
+    
+begin
+call pro1;
+x := y*2;
+end.

@@ -144,7 +144,7 @@ int is_sym(char c) {
 
 // Checks if indentifier is a reserved word and if so, returns its type
 int is_reserved(char identifier[]) {
-  for (int i = 0; i < 12; i++) {
+  for (int i = 0; i < 14; i++) {
     if (strcmp(reserved[i], identifier) == 0) {
       return res_enums[i];
     }
@@ -461,7 +461,7 @@ int num_symbols = 0;
 int sym_tbl_srch(char string[]) {
   for (int i = num_symbols - 1; i >= 0; i--) {
     // If matching symbol exists return it's index (i)
-    if (strcmp(string, symbol_table[i].name) == 0) {
+    if (strcmp(string, symbol_table[i].name) == 0 && symbol_table[i].mark == 0) {
       return i;
     }
   }
@@ -528,7 +528,7 @@ void error(errorCode error) {
            "semicolon");
     exit(1);
   case undefinedInden:
-    printf("Error: undeclared identifier: %s\n", curr_token.lexeme);
+    printf("Error: undeclared identifier: '%s' at level %d\n", curr_token.lexeme, globalLevel);
     exit(1);
   case ConstAltered:
     printf("Error: only variable values may be altered\n");
@@ -591,6 +591,18 @@ void markAllSymb() {
   for (int i = 0; i < num_symbols; i++) {
     symbol_table[i].mark = 1;
   }
+}
+
+// Mark all variables of procedure to one after procedure declaration (Trever Jones)
+void markProc() {
+  for (int i = num_symbols - 1; i >= 0; i--) {
+    if (symbol_table[i].kind == 3) {
+      break;
+    }
+    else {
+      symbol_table[i].mark = 1;
+    }
+ }
 }
 
 // Function signatures (Jose Porta)
@@ -904,7 +916,7 @@ void STATEMENT() {
     }
 
     if (symbol_table[i].kind == 3) {
-      emit(CAL, symbol_table[i].level, symbol_table[i].addr);
+      emit(CAL, globalLevel -  symbol_table[i].level, symbol_table[i].addr);
     }
 
     else {
@@ -955,8 +967,8 @@ void PROC_DECL() {
     if (curr_token.type != semicolonsym) {
       error(declareMissingSemicolon);
     }
-    emit(OPR, 0, 0);
     getNextToken();
+    markProc();
   }
   // getNextToken();
 }
@@ -1061,13 +1073,19 @@ int BLOCK() {
   globalLevel++;
   CONST_DECL();
   int numVars = VAR_DECL();
-  emit(INC, 0, (3 + numVars));
+  
   PROC_DECL();
   bx = cx * 3;
+  emit(INC, 0, (3 + numVars));
   instructionList[jmp_loc].M = bx;
   STATEMENT();
+  if (globalLevel > 0)
+  {
+    emit(OPR, 0, 0);
+  }
+  
   globalLevel--;
-  return bx;
+  return jmp_loc * 3;
 }
 
 // Program parser and code generation (Trever Jones)

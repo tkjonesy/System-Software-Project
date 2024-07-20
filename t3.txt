@@ -10,12 +10,11 @@ var x,y;
     procedure pro2;
             var p;
             begin
-                write p;
-                p := 3;
-                y :=  y + p*2;
+                
+                w := 10;
+                y := p*2;
             end;
 begin
-call pro1;
 call pro2;
 x := y*2;
 end.
