@@ -619,7 +619,7 @@ void FACTOR() {
 
     // Identifier is a var (Trever Jones)
     else {
-      emit(LOD, 0, symbol_table[symIdx].addr);
+      emit(LOD, globalLevel - symbol_table[symIdx].level, symbol_table[symIdx].addr);
     }
     getNextToken();
   } else if (curr_token.type == numbersym) {
@@ -772,7 +772,7 @@ void STATEMENT() {
 
     getNextToken();
     EXPRESSION();
-    emit(STO, 0, symbol_table[sym_idx].addr);
+    emit(STO, globalLevel - symbol_table[sym_idx].level, symbol_table[sym_idx].addr);
     break;
 
   // BEGIN statement declaration (Jose Porta)
@@ -879,7 +879,7 @@ void STATEMENT() {
     // Emit READ instruction
     emit(SYS, 0, 2);
     // Store input value in variable provided
-    emit(STO, 0, symbol_table[sym_idx].addr);
+    emit(STO, globalLevel - symbol_table[sym_idx].level, symbol_table[sym_idx].addr);
     break;
 
   // WRITE OUTPUT (Jose Porta)
