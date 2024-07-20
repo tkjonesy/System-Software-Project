@@ -509,11 +509,11 @@ void error(errorCode error) {
   case declareMissingIden:
     printf(
         "Error: const, var, procedure and read keywords must be followed by an "
-        "identifier: %s\n",
+        "identifier: '%s'\n",
         curr_token.lexeme);
     exit(1);
   case symbolTaken:
-    printf("Error: symbol name has already been declared %s\n",
+    printf("Error: symbol name has already been declared '%s'\n",
            curr_token.lexeme);
     exit(1);
   case constMissingEqual:
@@ -523,7 +523,7 @@ void error(errorCode error) {
     printf("Error: constants must be assigned an integer value\n");
     exit(1);
   case declareMissingSemicolon:
-    printf("Error: constant variable, and procedure declarations must be "
+    printf("Error: constant, variable, and procedure declarations must be "
            "followed by a "
            "semicolon");
     exit(1);
@@ -531,7 +531,7 @@ void error(errorCode error) {
     printf("Error: undeclared identifier: '%s' at level %d\n", curr_token.lexeme, globalLevel);
     exit(1);
   case ConstAltered:
-    printf("Error: only variable values may be altered\n");
+    printf("Error: only variable values may be altered: '%s'\n", curr_token.lexeme);
     exit(1);
   case missingBecomesym:
     printf("Error: assignment statements must use :=\n");
