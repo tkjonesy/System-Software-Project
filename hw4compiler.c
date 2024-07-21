@@ -941,9 +941,9 @@ void STATEMENT() {
       emit(CAL, globalLevel - symbol_table[i].level, symbol_table[i].addr);
       if (debug) {
         printf("procedure '%s' is being called with a global level of %d, a "
-              "local level of %d, and an address of %d\n",
-              symbol_table[i].name, globalLevel, symbol_table[i].level,
-              symbol_table[i].addr);
+               "local level of %d, and an address of %d\n",
+               symbol_table[i].name, globalLevel, symbol_table[i].level,
+               symbol_table[i].addr);
         callFixes[numFixes++] = cx - 1;
       }
     }
@@ -1269,15 +1269,18 @@ int main(int argc, char *argv[]) {
   fclose(output);
 
   // Print Symbol table (Trever Jones)
-  printf("\nSymbol Table:\n\n");
-  printf("%-5s | %-11s | %-5s | %-5s | %-7s | %-5s\n", "Kind", "Name", "Value",
-         "Level", "Address", "Mark");
-  printf("-------------------------------------------------------------\n");
-  for (int i = 0; i < num_symbols; i++) {
-    printf("%-5d | %-11s | %-5d | %-5d | %-7d | %-5d\n", symbol_table[i].kind,
-           symbol_table[i].name, symbol_table[i].val, symbol_table[i].level,
-           symbol_table[i].addr, symbol_table[i].mark);
-  }
+  // Symbol table output not needed for HW4
+  // printf("\nSymbol Table:\n\n");
+  // printf("%-5s | %-11s | %-5s | %-5s | %-7s | %-5s\n", "Kind", "Name",
+  // "Value",
+  //        "Level", "Address", "Mark");
+  // printf("-------------------------------------------------------------\n");
+  // for (int i = 0; i < num_symbols; i++) {
+  //   printf("%-5d | %-11s | %-5d | %-5d | %-7d | %-5d\n",
+  //   symbol_table[i].kind,
+  //          symbol_table[i].name, symbol_table[i].val, symbol_table[i].level,
+  //          symbol_table[i].addr, symbol_table[i].mark);
+  // }
 
   return 0;
 }
