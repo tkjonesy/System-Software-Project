@@ -9,7 +9,7 @@ procedure fact;
         f:=f*ans1;
     end;
 begin
-    n:=3;
+    n:=4;
     call fact;
     write f
 end.

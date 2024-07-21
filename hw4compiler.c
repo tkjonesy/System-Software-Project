@@ -453,7 +453,8 @@ typedef struct Symbol {
   int mark;      // to indicate unavailable or deleted
 } Symbol;
 
-// Array for storing CAL emits that need to be updated later for recursion (Trever Jones)
+// Array for storing CAL emits that need to be updated later for recursion
+// (Trever Jones)
 int callFixes[1000];
 int numFixes = 0;
 
@@ -465,7 +466,8 @@ int num_symbols = 0;
 int sym_tbl_srch(char string[]) {
   for (int i = num_symbols - 1; i >= 0; i--) {
     // If matching symbol exists return it's index (i)
-    if (strcmp(string, symbol_table[i].name) == 0 && symbol_table[i].mark == 0) {
+    if (strcmp(string, symbol_table[i].name) == 0 &&
+        symbol_table[i].mark == 0) {
       return i;
     }
   }
@@ -532,10 +534,12 @@ void error(errorCode error) {
            "semicolon");
     exit(1);
   case undefinedInden:
-    printf("Error: undeclared identifier: '%s' at level %d\n", curr_token.lexeme, globalLevel);
+    printf("Error: undeclared identifier: '%s' at level %d\n",
+           curr_token.lexeme, globalLevel);
     exit(1);
   case ConstAltered:
-    printf("Error: only variable values may be altered: '%s'\n", curr_token.lexeme);
+    printf("Error: only variable values may be altered: '%s'\n",
+           curr_token.lexeme);
     exit(1);
   case missingBecomesym:
     printf("Error: assignment statements must use :=\n");
@@ -597,16 +601,16 @@ void markAllSymb() {
   }
 }
 
-// Mark all variables of procedure to one after procedure declaration (Trever Jones)
+// Mark all variables of procedure to one after procedure declaration (Trever
+// Jones)
 void markProc() {
   for (int i = num_symbols - 1; i >= 0; i--) {
     if (symbol_table[i].kind == 3) {
       break;
-    }
-    else {
+    } else {
       symbol_table[i].mark = 1;
     }
- }
+  }
 }
 
 // Function signatures (Jose Porta)
@@ -635,7 +639,8 @@ void FACTOR() {
 
     // Identifier is a var (Trever Jones)
     else {
-      emit(LOD, globalLevel - symbol_table[symIdx].level, symbol_table[symIdx].addr);
+      emit(LOD, globalLevel - symbol_table[symIdx].level,
+           symbol_table[symIdx].addr);
     }
     getNextToken();
   } else if (curr_token.type == numbersym) {
@@ -788,7 +793,8 @@ void STATEMENT() {
 
     getNextToken();
     EXPRESSION();
-    emit(STO, globalLevel - symbol_table[sym_idx].level, symbol_table[sym_idx].addr);
+    emit(STO, globalLevel - symbol_table[sym_idx].level,
+         symbol_table[sym_idx].addr);
     break;
 
   // BEGIN statement declaration (Jose Porta)
@@ -895,7 +901,8 @@ void STATEMENT() {
     // Emit READ instruction
     emit(SYS, 0, 2);
     // Store input value in variable provided
-    emit(STO, globalLevel - symbol_table[sym_idx].level, symbol_table[sym_idx].addr);
+    emit(STO, globalLevel - symbol_table[sym_idx].level,
+         symbol_table[sym_idx].addr);
     break;
 
   // WRITE OUTPUT (Jose Porta)
@@ -920,8 +927,11 @@ void STATEMENT() {
     }
 
     if (symbol_table[i].kind == 3) {
-      emit(CAL, globalLevel -  symbol_table[i].level, symbol_table[i].addr);
-      printf("procedure '%s' is being called with a global level of %d, a local level of %d, and an address of %d\n", symbol_table[i].name, globalLevel, symbol_table[i].level, symbol_table[i].addr);
+      emit(CAL, globalLevel - symbol_table[i].level, symbol_table[i].addr);
+      printf("procedure '%s' is being called with a global level of %d, a "
+             "local level of %d, and an address of %d\n",
+             symbol_table[i].name, globalLevel, symbol_table[i].level,
+             symbol_table[i].addr);
       callFixes[numFixes++] = cx - 1;
     }
 
@@ -1002,7 +1012,8 @@ int VAR_DECL() {
       }
       // Check if identifier is taken
       int ident_idx = sym_tbl_srch(curr_token.lexeme);
-      if (ident_idx != -1) {
+      if (ident_idx != -1 && symbol_table[ident_idx].level == globalLevel) {
+
         error(symbolTaken);
       }
 
@@ -1087,17 +1098,16 @@ int BLOCK() {
   globalLevel++;
   CONST_DECL();
   int numVars = VAR_DECL();
-  
+
   PROC_DECL();
   bx = cx * 3;
   emit(INC, 0, (3 + numVars));
   instructionList[jmp_loc].M = bx;
   STATEMENT();
-  if (globalLevel > 0)
-  {
+  if (globalLevel > 0) {
     emit(OPR, 0, 0);
   }
-  
+
   globalLevel--;
   return jmp_loc * 3;
 }
