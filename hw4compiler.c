@@ -793,6 +793,13 @@ void STATEMENT() {
 
     getNextToken();
     EXPRESSION();
+    if (debug) {
+      printf("\nSTO emitted for symbol %s in level %d, address %d with global "
+             "level %d\n\n",
+             symbol_table[sym_idx].name, symbol_table[sym_idx].level,
+             symbol_table[sym_idx].addr, globalLevel);
+    }
+
     emit(STO, globalLevel - symbol_table[sym_idx].level,
          symbol_table[sym_idx].addr);
     break;
