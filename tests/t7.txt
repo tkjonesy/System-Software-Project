@@ -1,0 +1,9 @@
+var x,y;
+    procedure pro1;
+        var w;
+        begin
+            y := 2*w - 10;
+        end;
+begin
+x := pro1*2;
+end.
