@@ -13,14 +13,14 @@ int PAS[ARRAY_SIZE] = {0};
 
 // Instruction and Opr. enums (Jose Porta)
 enum Instruct { LIT = 1, OPR, LOD, STO, CAL, INC, JMP, JPC, SYS };
-enum Oprs { RTN = 0, ADD, SUB, MUL, DIV, EQL, NEQ, LSS, LEQ, GTR, GEQ };
+enum Oprs { RTN = 0, ADD, SUB, MUL, DIV, EQL, NEQ, LSS, LEQ, GTR, GEQ, ODD };
 
 // Instruct names as strings (Jose Porta)
 // "N/A" is a place holder so string indexes align with Instruct enum
 char i_names[10][4] = {"N/A", "LIT", "OPR", "LOD", "STO",
                        "CAL", "INC", "JMP", "JPC", "SYS"};
-char opr_names[11][4] = {"RTN", "ADD", "SUB", "MUL", "DIV", "EQL",
-                         "NEQ", "LSS", "LEQ", "GTR", "GEQ"};
+char opr_names[12][4] = {"RTN", "ADD", "SUB", "MUL", "DIV", "EQL",
+                         "NEQ", "LSS", "LEQ", "GTR", "GEQ", "ODD"};
 
 // Struct for Instruction Register (Trever Jones)
 typedef struct InstructionRegister {
@@ -163,10 +163,9 @@ int main(int argc, char *argv[]) {
         break;
 
       case GEQ:
-        PAS[SP + 1] = PAS[SP + 1] > PAS[SP];
+        PAS[SP + 1] = PAS[SP + 1] >= PAS[SP];
         SP++;
         break;
-
       default:
         break;
       }

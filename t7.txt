@@ -1,0 +1,17 @@
+const b = 2;
+var x,y;
+    procedure pro1;
+        const d = 4;
+        begin
+            y := d;
+            while y > 0 do
+                begin
+                    y := y - 1;
+                    x := x * x;
+                end;
+        end;
+begin
+    x := b;
+    call pro1;
+    write x;
+end.
