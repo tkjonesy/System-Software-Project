@@ -453,6 +453,10 @@ typedef struct Symbol {
   int mark;      // to indicate unavailable or deleted
 } Symbol;
 
+// Array for storing CAL emits that need to be updated later for recursion (Trever Jones)
+int callFixes[1000];
+int numFixes = 0;
+
 // SYMBOL TABLE(Jose Porta)
 Symbol symbol_table[MAX_SYMBOL_TABLE_SIZE];
 int num_symbols = 0;
@@ -917,6 +921,8 @@ void STATEMENT() {
 
     if (symbol_table[i].kind == 3) {
       emit(CAL, globalLevel -  symbol_table[i].level, symbol_table[i].addr);
+      printf("procedure '%s' is being called with a global level of %d, a local level of %d, and an address of %d\n", symbol_table[i].name, globalLevel, symbol_table[i].level, symbol_table[i].addr);
+      callFixes[numFixes++] = cx - 1;
     }
 
     else {
@@ -964,6 +970,14 @@ void PROC_DECL() {
     int bx = BLOCK();
     printf("exit block\n");
     symbol_table[tx].addr = bx;
+
+    // Update all placeholder calls to this procedure (Trever Jones)
+    for (int i = 0; i < numFixes; i++) {
+      if (instructionList[callFixes[i]].M == 0) {
+        instructionList[callFixes[i]].M = bx;
+      }
+    }
+
     if (curr_token.type != semicolonsym) {
       error(declareMissingSemicolon);
     }
