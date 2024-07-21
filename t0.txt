@@ -1,0 +1,21 @@
+const b = 5;
+var x,y;
+    procedure pro1;
+        var b;
+        begin
+            
+            b := 13;
+            y := b*2;
+        end;
+    procedure pro2;
+            var p;
+            begin
+                write p;
+                p := 3;
+                y :=  y + p*2;
+            end;
+begin
+call pro1;
+call pro2;
+x := y*2;
+end.

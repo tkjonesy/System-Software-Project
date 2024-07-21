@@ -1220,14 +1220,12 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  printf("Source Program:\n%s\n\n", inputArr);
   // Lex table not needed in output
   // printf("Lexeme Table:\n\n");
   // printf("Lexeme Token   Type\n");
 
   // Parse inputArr
   parser(fileSize, inputArr);
-  free(inputArr);
 
   // Token list not needed in output (Jose Porta)
   // printf("\nToken List:\n");
@@ -1242,7 +1240,8 @@ int main(int argc, char *argv[]) {
 
   // Run code generation (Trever Jones)
   PROGRAM();
-
+  printf("Source Program:\n%s\n\n", inputArr);
+  free(inputArr);
   // Output OP code to file (Trever Jones)
   // char outputFilename[50];
   // snprintf(outputFilename, sizeof(outputFilename), "Assembly-Output-%s",
