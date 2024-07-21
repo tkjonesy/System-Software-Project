@@ -531,16 +531,14 @@ void error(errorCode error) {
     printf("Error: constants must be assigned an integer value\n");
     exit(1);
   case declareMissingSemicolon:
-    printf("Error: constant, variable, and procedure declarations must be "
-           "followed by a "
-           "semicolon");
+    printf("Error: semicolon expected after \"%s\".\n", curr_token.lexeme);
     exit(1);
   case undefinedInden:
     printf("Error: undeclared identifier: '%s' at level %d\n",
            curr_token.lexeme, globalLevel);
     exit(1);
   case ConstAltered:
-    printf("Error: only variable values may be altered: '%s'\n",
+    printf("Error: assignment to constant or procedure is not allowed: '%s'\n",
            curr_token.lexeme);
     exit(1);
   case missingBecomesym:
