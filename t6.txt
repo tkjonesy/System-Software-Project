@@ -1,9 +1,9 @@
 var x,y,z,v,w;
-procedure a;
+procedure pro1;
     var x,y,u,v;
-    procedure b;
+    procedure pro2;
         var y,z,v;
-        procedure c;
+        procedure pro3;
             var y,z;
             begin
                 z:=1;
@@ -11,16 +11,16 @@ procedure a;
             end;
         begin
             y:=x+u+w;
-            call c
+            call pro3
         end;
     begin
         z:=2;
         u:=z+w;
-        call b
+        call pro2
     end;
-    begin
-        x:=1; y:=2; z:=3; v:=4; w:=5;
-        x:=v+w;
-        write z;
-        call a;
+begin
+    x:=1; y:=2; z:=3; v:=4; w:=5;
+    x:=v+w;
+    write z;
+    call pro1;
 end.

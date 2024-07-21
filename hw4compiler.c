@@ -442,7 +442,7 @@ START OF PARSER
 */
 
 // Debug mode switch (prints extra details) (Jose Porta)
-int debug = 1;
+int debug = 0;
 // Symbol struct (Jose Porta)
 typedef struct Symbol {
   int kind;      // const = 1, var = 2, proc = 3
@@ -606,6 +606,10 @@ void markAllSymb() {
 void markProc() {
   for (int i = num_symbols - 1; i >= 0; i--) {
     if (symbol_table[i].kind == 3) {
+      // Skip over procedures from higher levels (Trever Jones)
+      if (symbol_table[i].level > globalLevel) {
+        continue;
+      }
       break;
     } else {
       symbol_table[i].mark = 1;
@@ -935,11 +939,13 @@ void STATEMENT() {
 
     if (symbol_table[i].kind == 3) {
       emit(CAL, globalLevel - symbol_table[i].level, symbol_table[i].addr);
-      printf("procedure '%s' is being called with a global level of %d, a "
-             "local level of %d, and an address of %d\n",
-             symbol_table[i].name, globalLevel, symbol_table[i].level,
-             symbol_table[i].addr);
-      callFixes[numFixes++] = cx - 1;
+      if (debug) {
+        printf("procedure '%s' is being called with a global level of %d, a "
+              "local level of %d, and an address of %d\n",
+              symbol_table[i].name, globalLevel, symbol_table[i].level,
+              symbol_table[i].addr);
+        callFixes[numFixes++] = cx - 1;
+      }
     }
 
     else {
@@ -980,12 +986,15 @@ void PROC_DECL() {
     if (curr_token.type != semicolonsym) {
       error(declareMissingSemicolon);
     }
-    printf("enter block\n");
+    if (debug) {
+      printf("enter block\n");
+    }
     getNextToken();
-    /* NOTE: Fix scoping issues e.g. procedures can access variables 1 level
-     * higher but cant store values there*/
+
     int bx = BLOCK();
-    printf("exit block\n");
+    if (debug) {
+      printf("exit block\n");
+    }
     symbol_table[tx].addr = bx;
 
     // Update all placeholder calls to this procedure (Trever Jones)
