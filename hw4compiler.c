@@ -180,7 +180,9 @@ int tokenize() {
   }
 
   tokenList[num_tokens] = curr_token;
-  printf("%-15s%d\n", tokenList[num_tokens].lexeme, tokenList[num_tokens].type);
+  // Tokens are not needed in output
+  // printf("%-15s%d\n", tokenList[num_tokens].lexeme,
+  // tokenList[num_tokens].type);
   num_tokens++;
   curr_token.type = 0;
   reset_lexeme();
@@ -1221,32 +1223,38 @@ int main(int argc, char *argv[]) {
   }
 
   printf("Source Program:\n%s\n\n", inputArr);
-  printf("Lexeme Table:\n\n");
-  printf("Lexeme Token   Type\n");
+  // Lex table not needed in output
+  // printf("Lexeme Table:\n\n");
+  // printf("Lexeme Token   Type\n");
 
   // Parse inputArr
   parser(fileSize, inputArr);
   free(inputArr);
 
-  printf("\nToken List:\n");
-  for (int i = 0; i < num_tokens; i++) {
-    if (tokenList[i].type == identsym || tokenList[i].type == numbersym) {
-      printf("%d %s ", tokenList[i].type, tokenList[i].lexeme);
-    } else {
-      printf("%d ", tokenList[i].type);
-    }
-  }
+  // Token list not needed in output (Jose Porta)
+  // printf("\nToken List:\n");
+  // for (int i = 0; i < num_tokens; i++) {
+  //   if (tokenList[i].type == identsym || tokenList[i].type == numbersym) {
+  //     printf("%d %s ", tokenList[i].type, tokenList[i].lexeme);
+  //   } else {
+  //     printf("%d ", tokenList[i].type);
+  //   }
+  // }
   printf("\n");
 
   // Run code generation (Trever Jones)
   PROGRAM();
 
   // Output OP code to file (Trever Jones)
-  char outputFilename[50];
-  snprintf(outputFilename, sizeof(outputFilename), "Assembly-Output-%s",
-           inputFilename);
-  output = fopen(outputFilename, "w");
+  // char outputFilename[50];
+  // snprintf(outputFilename, sizeof(outputFilename), "Assembly-Output-%s",
+  //          inputFilename);
+  output = fopen("elf.txt", "w");
 
+  // Since errors are handled in the main program cycle,
+  // reaching this point indicates code is error-free and syntactically correct
+  // (Jose Porta)
+  printf("No errors, program is syntactically correct\n");
   // Print OP codes (Jose Porta)
   printf("\nAssembly Code:\n\n");
   printf("Line\tOP\tL\tM\n");
