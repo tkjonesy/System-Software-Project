@@ -65,146 +65,64 @@ Ensure input file is in the same directory then run the .exe passing the input f
 
 ```
 # Example command and expected output
-./hw4compiler validInput.txt
+./hw4compiler input.txt
 
 # Output: Result of processing validInput.txt
 Source Program:
-const a = 2, b = 2;
-var x, y, z;
+var f, n;
+procedure fact;
+    var ans1;
+    begin
+        ans1:=n;
+        n:= n-1;
+        if n = 0 then f := 1fi;
+        if n > 0 then call fact fi;
+        f:=f*ans1;
+    end;
 begin
-read x;
-y := x + a;
-z := y * b;
-while z > 0 do
-  z := z - 1;
-if z = 0 then
-  write z
-  fi;
-write (z + a) * (b / a)
+    n:=4;
+    call fact;
+    write f
 end.
 
-Lexeme Table:
 
-Lexeme Token   Type
-const          28
-a              2
-=              9
-2              3
-,              17
-b              2
-=              9
-2              3
-;              18
-var            29
-x              2
-,              17
-y              2
-,              17
-z              2
-;              18
-begin          21
-read           32
-x              2
-;              18
-y              2
-:=             20
-x              2
-+              4
-a              2
-;              18
-z              2
-:=             20
-y              2
-*              6
-b              2
-;              18
-while          25
-z              2
->              13
-0              3
-do             26
-z              2
-:=             20
-z              2
--              5
-1              3
-;              18
-if             23
-z              2
-=              9
-0              3
-then           24
-write          31
-z              2
-fi             8
-;              18
-write          31
-(              15
-z              2
-+              4
-a              2
-)              16
-*              6
-(              15
-b              2
-/              7
-a              2
-)              16
-end            22
-.              19
-
-Token List:
-28 2 a 9 3 2 17 2 b 9 3 2 18 29 2 x 17 2 y 17 2 z 18 21 32 2 x 18 2 y 20 2 x 4 2 a 18 2 z 20 2 y 6 2 b 18 25 2 z 13 3 0 26 2 z 20 2 z 5 3 1 18 23 2 z 9 3 0 24 31 2 z 8 18 31 15 2 z 4 2 a 16 6 15 2 b 7 2 a 16 22 19
+No errors, program is syntactically correct
 
 Assembly Code:
 
 Line    OP      L       M
-0       JMP     0       3
-1       INC     0       6
-2       SYS     0       2
-3       STO     0       3
-4       LOD     0       3
-5       LIT     0       2
-6       OPR     0       1
-7       STO     0       4
-8       LOD     0       4
-9       LIT     0       2
-10      OPR     0       3
-11      STO     0       5
-12      LOD     0       5
-13      LIT     0       0
-14      OPR     0       9
-15      JPC     0       63
-16      LOD     0       5
-17      LIT     0       1
-18      OPR     0       2
-19      STO     0       5
-20      JMP     0       36
-21      LOD     0       5
-22      LIT     0       0
-23      OPR     0       5
-24      JPC     0       81
-25      LOD     0       5
-26      SYS     0       1
-27      LOD     0       5
-28      LIT     0       2
-29      OPR     0       1
-30      LIT     0       2
-31      LIT     0       2
-32      OPR     0       4
-33      OPR     0       3
-34      SYS     0       1
-35      SYS     0       3
-
-Symbol Table:
-
-Kind  | Name        | Value | Level | Address | Mark
--------------------------------------------------------------
-1     | a           | 2     | 0     | 0       | 1
-1     | b           | 2     | 0     | 0       | 1
-2     | x           | 0     | 0     | 3       | 1
-2     | y           | 0     | 0     | 4       | 1
-2     | z           | 0     | 0     | 5       | 1
+0       JMP     0       75
+1       JMP     0       6
+2       INC     0       4
+3       LOD     1       4
+4       STO     0       3
+5       LOD     1       4
+6       LIT     0       1
+7       OPR     0       2
+8       STO     1       4
+9       LOD     1       4
+10      LIT     0       0
+11      OPR     0       5
+12      JPC     0       45
+13      LIT     0       1
+14      STO     1       3
+15      LOD     1       4
+16      LIT     0       0
+17      OPR     0       9
+18      JPC     0       60
+19      CAL     1       0
+20      LOD     1       3
+21      LOD     0       3
+22      OPR     0       3
+23      STO     1       3
+24      OPR     0       0
+25      INC     0       5
+26      LIT     0       4
+27      STO     0       4
+28      CAL     0       3
+29      LOD     0       3
+30      SYS     0       1
+31      SYS     0       3
 ```
 
 ## Team Members

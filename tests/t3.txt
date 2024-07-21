@@ -1,5 +1,7 @@
 const b = 5;
 var x,y;
+    procedure pro1;
 begin
 x := y*2;
+pro1 := x
 end.
