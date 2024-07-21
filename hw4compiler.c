@@ -531,7 +531,7 @@ void error(errorCode error) {
     printf("Error: constants must be assigned an integer value\n");
     exit(1);
   case declareMissingSemicolon:
-    printf("Error: semicolon expected: '%s'\n", curr_token.lexeme);
+    printf("Error: semicolon expected after \"%s\".\n", curr_token.lexeme);
     exit(1);
   case undefinedInden:
     printf("Error: undeclared identifier: '%s' at level %d\n",
@@ -590,6 +590,7 @@ void emit(int OP, int L, int M) {
     instructionList[cx].OP = OP;
     instructionList[cx].L = L;
     instructionList[cx].M = M;
+
     cx++;
   }
 }
@@ -639,11 +640,9 @@ void FACTOR() {
     // Identifier is a const (Trever Jones)
     if (symbol_table[symIdx].kind == 1) {
       emit(LIT, 0, symbol_table[symIdx].val);
-    } else if (symbol_table[symIdx].kind == 3)
-    {
-      error(arithmeticError);
+    } else if (symbol_table[symIdx].kind != 2) {
+      /* code */
     }
-    
 
     // Identifier is a var (Trever Jones)
     else {
@@ -943,12 +942,12 @@ void STATEMENT() {
 
     if (symbol_table[i].kind == 3) {
       emit(CAL, globalLevel - symbol_table[i].level, symbol_table[i].addr);
-      callFixes[numFixes++] = cx - 1;
       if (debug) {
         printf("procedure '%s' is being called with a global level of %d, a "
                "local level of %d, and an address of %d\n",
                symbol_table[i].name, globalLevel, symbol_table[i].level,
                symbol_table[i].addr);
+        callFixes[numFixes++] = cx - 1;
       }
     }
 
