@@ -590,7 +590,6 @@ void emit(int OP, int L, int M) {
     instructionList[cx].OP = OP;
     instructionList[cx].L = L;
     instructionList[cx].M = M;
-
     cx++;
   }
 }
@@ -640,10 +639,11 @@ void FACTOR() {
     // Identifier is a const (Trever Jones)
     if (symbol_table[symIdx].kind == 1) {
       emit(LIT, 0, symbol_table[symIdx].val);
-    } else if (symbol_table[symIdx].kind == 3) {
+    } else if (symbol_table[symIdx].kind == 3)
+    {
       error(arithmeticError);
     }
-
+    
     // Identifier is a var (Trever Jones)
     else {
       emit(LOD, globalLevel - symbol_table[symIdx].level,
@@ -857,7 +857,7 @@ void STATEMENT() {
 
     // Update JPC with location after conditional statement
     // (location is mult. by 3 to account for PC in VM)
-    instructionList[jpc_idx].M = cx * 3 + 10;
+    instructionList[jpc_idx].M = cx * 3;
     getNextToken();
     break;
 
@@ -866,7 +866,7 @@ void STATEMENT() {
     getNextToken();
     // Location of loop start in code array
     // (location is mult. by 3 to account for PC in VM)
-    int loop_idx = cx * 3 + 10;
+    int loop_idx = cx * 3;
     CONDITION();
 
     // Check for "do" following "while"
@@ -887,7 +887,7 @@ void STATEMENT() {
 
     // Update JPC with location after while statement
     // (location is mult. by 3 to account for PC in VM)
-    instructionList[jpc_idx].M = cx * 3 + 10;
+    instructionList[jpc_idx].M = cx * 3;
     break;
 
   // READ INPUT (Jose Porta)
@@ -1119,7 +1119,7 @@ int BLOCK() {
   int numVars = VAR_DECL();
 
   PROC_DECL();
-  bx = cx * 3 + 10;
+  bx = cx * 3;
   emit(INC, 0, (3 + numVars));
   instructionList[jmp_loc].M = bx;
   STATEMENT();
@@ -1128,7 +1128,7 @@ int BLOCK() {
   }
 
   globalLevel--;
-  return jmp_loc * 3 + 10;
+  return jmp_loc * 3;
 }
 
 // Program parser and code generation (Trever Jones)
@@ -1250,7 +1250,6 @@ int main(int argc, char *argv[]) {
   // char outputFilename[50];
   // snprintf(outputFilename, sizeof(outputFilename), "Assembly-Output-%s",
   //          inputFilename);
-
   output = fopen("elf.txt", "w");
 
   // Since errors are handled in the main program cycle,

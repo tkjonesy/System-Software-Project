@@ -75,7 +75,7 @@ int main(int argc, char *argv[]) {
   // Register initialization (Jose Porta)
   int BP = 499;
   int SP = 500;
-  int PC = 10;
+  int PC = 0;
 
   // An array to keep track AR borders for printing "|" (Trever Jones)
   int BPHistory[100];
