@@ -12,18 +12,18 @@ constdeclaration ::= ["const" ident "=" number {"," ident "=" number} ";"].<br>
 var-declaration ::= [ "var "ident {"," ident} “;"].<br>
 procedure-declaration ::= { "procedure" ident ";" block ";" }<br>
 statement ::= [ ident ":=" expression<br>
-  | "call" ident<br>
-  | "begin" statement { ";" statement } "end"<br>
-  | "if" condition "then" statement "fi"<br>
-  | "while" condition "do" statement<br>
-  | "read" ident<br>
-  | "write" expression<br>
-  | empty ] .<br>
+| "call" ident<br>
+| "begin" statement { ";" statement } "end"<br>
+| "if" condition "then" statement "fi"<br>
+| "while" condition "do" statement<br>
+| "read" ident<br>
+| "write" expression<br>
+| empty ] .<br>
 condition ::= "odd" expression<br>
-  | expression rel-op expression.<br>
+| expression rel-op expression.<br>
 rel-op ::= "="|“< >"|"<"|"<="|">"|">=“.<br>
 expression ::= term { ("+"|"-") term}.<br>
-term ::= factor {("*"|"/") factor}.<br>
+term ::= factor {("\*"|"/") factor}.<br>
 factor ::= ident | number | "(" expression ")“.<br>
 number ::= digit {digit}.<br>
 ident ::= letter {letter | digit}.<br>
@@ -91,8 +91,8 @@ No errors, program is syntactically correct
 Assembly Code:
 
 Line    OP      L       M
-0       JMP     0       75
-1       JMP     0       6
+0       JMP     0       85
+1       JMP     0       16
 2       INC     0       4
 3       LOD     1       4
 4       STO     0       3
@@ -103,14 +103,14 @@ Line    OP      L       M
 9       LOD     1       4
 10      LIT     0       0
 11      OPR     0       5
-12      JPC     0       45
+12      JPC     0       55
 13      LIT     0       1
 14      STO     1       3
 15      LOD     1       4
 16      LIT     0       0
 17      OPR     0       9
-18      JPC     0       60
-19      CAL     1       0
+18      JPC     0       70
+19      CAL     1       13
 20      LOD     1       3
 21      LOD     0       3
 22      OPR     0       3
@@ -119,7 +119,7 @@ Line    OP      L       M
 25      INC     0       5
 26      LIT     0       4
 27      STO     0       4
-28      CAL     0       3
+28      CAL     0       13
 29      LOD     0       3
 30      SYS     0       1
 31      SYS     0       3
