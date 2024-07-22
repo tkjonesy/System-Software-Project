@@ -531,7 +531,7 @@ void error(errorCode error) {
     printf("Error: constants must be assigned an integer value\n");
     exit(1);
   case declareMissingSemicolon:
-    printf("Error: semicolon expected after \"%s\".\n", curr_token.lexeme);
+    printf("Error: semicolon expected: '%s'\n", curr_token.lexeme);
     exit(1);
   case undefinedInden:
     printf("Error: undeclared identifier: '%s' at level %d\n",
@@ -640,8 +640,8 @@ void FACTOR() {
     // Identifier is a const (Trever Jones)
     if (symbol_table[symIdx].kind == 1) {
       emit(LIT, 0, symbol_table[symIdx].val);
-    } else if (symbol_table[symIdx].kind != 2) {
-      /* code */
+    } else if (symbol_table[symIdx].kind == 3) {
+      error(arithmeticError);
     }
 
     // Identifier is a var (Trever Jones)
@@ -857,7 +857,7 @@ void STATEMENT() {
 
     // Update JPC with location after conditional statement
     // (location is mult. by 3 to account for PC in VM)
-    instructionList[jpc_idx].M = cx * 3;
+    instructionList[jpc_idx].M = cx * 3 + 10;
     getNextToken();
     break;
 
@@ -866,7 +866,7 @@ void STATEMENT() {
     getNextToken();
     // Location of loop start in code array
     // (location is mult. by 3 to account for PC in VM)
-    int loop_idx = cx * 3;
+    int loop_idx = cx * 3 + 10;
     CONDITION();
 
     // Check for "do" following "while"
@@ -887,7 +887,7 @@ void STATEMENT() {
 
     // Update JPC with location after while statement
     // (location is mult. by 3 to account for PC in VM)
-    instructionList[jpc_idx].M = cx * 3;
+    instructionList[jpc_idx].M = cx * 3 + 10;
     break;
 
   // READ INPUT (Jose Porta)
@@ -942,12 +942,12 @@ void STATEMENT() {
 
     if (symbol_table[i].kind == 3) {
       emit(CAL, globalLevel - symbol_table[i].level, symbol_table[i].addr);
+      callFixes[numFixes++] = cx - 1;
       if (debug) {
         printf("procedure '%s' is being called with a global level of %d, a "
                "local level of %d, and an address of %d\n",
                symbol_table[i].name, globalLevel, symbol_table[i].level,
                symbol_table[i].addr);
-        callFixes[numFixes++] = cx - 1;
       }
     }
 
@@ -1119,7 +1119,7 @@ int BLOCK() {
   int numVars = VAR_DECL();
 
   PROC_DECL();
-  bx = cx * 3;
+  bx = cx * 3 + 10;
   emit(INC, 0, (3 + numVars));
   instructionList[jmp_loc].M = bx;
   STATEMENT();
@@ -1128,7 +1128,7 @@ int BLOCK() {
   }
 
   globalLevel--;
-  return jmp_loc * 3;
+  return jmp_loc * 3 + 10;
 }
 
 // Program parser and code generation (Trever Jones)
@@ -1223,12 +1223,14 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
+  printf("Source Program:\n%s\n\n", inputArr);
   // Lex table not needed in output
   // printf("Lexeme Table:\n\n");
   // printf("Lexeme Token   Type\n");
 
   // Parse inputArr
   parser(fileSize, inputArr);
+  free(inputArr);
 
   // Token list not needed in output (Jose Porta)
   // printf("\nToken List:\n");
@@ -1243,12 +1245,12 @@ int main(int argc, char *argv[]) {
 
   // Run code generation (Trever Jones)
   PROGRAM();
-  printf("Source Program:\n%s\n\n", inputArr);
-  free(inputArr);
+
   // Output OP code to file (Trever Jones)
   // char outputFilename[50];
   // snprintf(outputFilename, sizeof(outputFilename), "Assembly-Output-%s",
   //          inputFilename);
+
   output = fopen("elf.txt", "w");
 
   // Since errors are handled in the main program cycle,
