@@ -13,14 +13,14 @@ int PAS[ARRAY_SIZE] = {0};
 
 // Instruction and Opr. enums (Jose Porta)
 enum Instruct { LIT = 1, OPR, LOD, STO, CAL, INC, JMP, JPC, SYS };
-enum Oprs { RTN = 0, ADD, SUB, MUL, DIV, EQL, NEQ, LSS, LEQ, GTR, GEQ, ODD };
+enum Oprs { RTN = 0, ADD, SUB, MUL, DIV, EQL, NEQ, LSS, LEQ, GTR, GEQ };
 
 // Instruct names as strings (Jose Porta)
 // "N/A" is a place holder so string indexes align with Instruct enum
 char i_names[10][4] = {"N/A", "LIT", "OPR", "LOD", "STO",
                        "CAL", "INC", "JMP", "JPC", "SYS"};
-char opr_names[12][4] = {"RTN", "ADD", "SUB", "MUL", "DIV", "EQL",
-                         "NEQ", "LSS", "LEQ", "GTR", "GEQ", "ODD"};
+char opr_names[11][4] = {"RTN", "ADD", "SUB", "MUL", "DIV", "EQL",
+                         "NEQ", "LSS", "LEQ", "GTR", "GEQ"};
 
 // Struct for Instruction Register (Trever Jones)
 typedef struct InstructionRegister {
@@ -44,7 +44,7 @@ int base(int BP, int L) {
 
 int main(int argc, char *argv[]) {
   int OP, L, M;
-  int index = 0;
+  int index = 10;
 
   FILE *file;
   file = fopen(argv[1], "r");
@@ -75,7 +75,7 @@ int main(int argc, char *argv[]) {
   // Register initialization (Jose Porta)
   int BP = 499;
   int SP = 500;
-  int PC = 0;
+  int PC = 10;
 
   // An array to keep track AR borders for printing "|" (Trever Jones)
   int BPHistory[100];
@@ -163,9 +163,10 @@ int main(int argc, char *argv[]) {
         break;
 
       case GEQ:
-        PAS[SP + 1] = PAS[SP + 1] >= PAS[SP];
+        PAS[SP + 1] = PAS[SP + 1] > PAS[SP];
         SP++;
         break;
+
       default:
         break;
       }

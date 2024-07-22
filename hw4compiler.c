@@ -617,6 +617,15 @@ void markProc() {
   }
 }
 
+// Function to update addresses to account for 10 offset (Trever Jones)
+void addOffset() {
+  for (int i = 0; i < cx; i++) {
+    if (instructionList[i].OP == JMP || instructionList[i].OP == JPC || instructionList[i].OP == CAL) {
+      instructionList[i].M = instructionList[i].M + 10;
+    }
+  }
+}
+
 // Function signatures (Jose Porta)
 void FACTOR();
 void TERM();
@@ -1245,6 +1254,9 @@ int main(int argc, char *argv[]) {
 
   // Run code generation (Trever Jones)
   PROGRAM();
+
+  // Update the offset for HW1s VM (Trever Jones)
+  addOffset();
 
   // Output OP code to file (Trever Jones)
   // char outputFilename[50];
